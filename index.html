@@ -7173,6 +7173,45 @@ function renderCh01TabSummary(creator) {
       </div>
       <div class="chart-canvas-wrap"><canvas id="ch-imp-views"></canvas></div>
     </div>
+
+    <!-- 롱폼 vs 숏폼 비중 도넛 3개 -->
+    <div class="ch01-donut-row" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;">
+      <div class="chart-card" style="text-align:center;">
+        <h3 style="margin-bottom:4px;">업로드 비중</h3>
+        <div class="chart-sub">롱폼 ${totalLong}건 · 숏폼 ${totalShort}건</div>
+        <div style="position:relative;height:160px;margin-top:8px;">
+          ${(totalLong + totalShort) > 0 ? `<canvas id="ch01-donut-uploads"></canvas>` : `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-mute);font-size:12px;">데이터 부족</div>`}
+        </div>
+        <div style="display:flex;justify-content:center;gap:14px;margin-top:10px;font-size:11px;">
+          <span><span style="display:inline-block;width:8px;height:8px;background:#534AB7;border-radius:50%;margin-right:5px;"></span>롱폼 ${longUploadPct}%</span>
+          <span><span style="display:inline-block;width:8px;height:8px;background:#D85A30;border-radius:50%;margin-right:5px;"></span>숏폼 ${100 - longUploadPct}%</span>
+        </div>
+      </div>
+
+      <div class="chart-card" style="text-align:center;">
+        <h3 style="margin-bottom:4px;">조회수 비중</h3>
+        <div class="chart-sub">롱폼 ${fmt.numK(longViews)} · 숏폼 ${fmt.numK(shortViews)}</div>
+        <div style="position:relative;height:160px;margin-top:8px;">
+          ${(longViews + shortViews) > 0 ? `<canvas id="ch01-donut-views"></canvas>` : `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-mute);font-size:12px;">데이터 부족</div>`}
+        </div>
+        <div style="display:flex;justify-content:center;gap:14px;margin-top:10px;font-size:11px;">
+          <span><span style="display:inline-block;width:8px;height:8px;background:#534AB7;border-radius:50%;margin-right:5px;"></span>롱폼 ${longViewsPct}%</span>
+          <span><span style="display:inline-block;width:8px;height:8px;background:#D85A30;border-radius:50%;margin-right:5px;"></span>숏폼 ${100 - longViewsPct}%</span>
+        </div>
+      </div>
+
+      <div class="chart-card" style="text-align:center;">
+        <h3 style="margin-bottom:4px;">구독 기여 비중</h3>
+        <div class="chart-sub">롱폼 +${fmt.num(Math.max(0, longSubs))} · 숏폼 +${fmt.num(Math.max(0, shortSubs))}</div>
+        <div style="position:relative;height:160px;margin-top:8px;">
+          ${(Math.max(0,longSubs) + Math.max(0,shortSubs)) > 0 ? `<canvas id="ch01-donut-subs"></canvas>` : `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-mute);font-size:11px;text-align:center;padding:0 12px;">videos 시트에<br>영상별 sub_change<br>입력 후 표시됩니다</div>`}
+        </div>
+        <div style="display:flex;justify-content:center;gap:14px;margin-top:10px;font-size:11px;">
+          <span><span style="display:inline-block;width:8px;height:8px;background:#534AB7;border-radius:50%;margin-right:5px;"></span>롱폼 ${longSubsPct}%</span>
+          <span><span style="display:inline-block;width:8px;height:8px;background:#D85A30;border-radius:50%;margin-right:5px;"></span>숏폼 ${100 - longSubsPct}%</span>
+        </div>
+      </div>
+    </div>
   `;
 }
 
@@ -7748,8 +7787,9 @@ function ma4(arr, key) {
 
 function buildAllCharts(creator) {
   if (!creator) return;
-  // v12.5: 서브탭 없음, Summary만 표시 → ch-imp-views 차트만 빌드
+  // v12.5: 서브탭 없음, Summary만 표시 → ch-imp-views 차트 + 도넛 3개 빌드
   buildChImpViews(creator);
+  buildCh01SummaryDonuts(creator);
 }
 
 // §01 노출 vs 조회 차트 (Summary 탭)
@@ -7787,9 +7827,41 @@ function buildChImpViews(creator) {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(26,26,26,0.92)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          titleFont: { size: 11, weight: '600' },
+          bodyFont: { size: 12, family: 'JetBrains Mono, monospace' },
+          padding: 10,
+          cornerRadius: 6,
+          displayColors: true,
+          callbacks: {
+            title: (items) => items[0]?.label || '',
+            label: (ctx) => {
+              const v = ctx.raw;
+              const formatted = v >= 1e6 ? (v/1e6).toFixed(2) + 'M' : v >= 1e3 ? (v/1e3).toFixed(1) + 'K' : v.toLocaleString();
+              return `${ctx.dataset.label}: ${formatted}`;
+            },
+            afterBody: (items) => {
+              if (items.length < 2) return '';
+              const imp = items.find(i => i.dataset.label === '노출수')?.raw || 0;
+              const views = items.find(i => i.dataset.label === '조회수')?.raw || 0;
+              if (imp > 0) {
+                const vr = (views / imp * 100).toFixed(2);
+                return ['', `조회율(VTR): ${vr}%`];
+              }
+              return '';
+            }
+          }
+        }
+      },
       scales: {
-        y: { beginAtZero: true, ticks: { font: { size: 10 } } },
+        y: { beginAtZero: true, ticks: { font: { size: 10 }, callback: v => v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'K':v } },
         x: { ticks: { font: { size: 9 }, maxRotation: 0, autoSkip: true, autoSkipPadding: 16 } }
       }
     }
