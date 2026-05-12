@@ -864,7 +864,7 @@ function computePentagon(creator, weekly) {
   
   // ④ 인게이지먼트: engagement_rate (0.8% = 100점)
   const validER = weekly.filter(w => w.views > 0);
-  const totalEng = validER.reduce((s, w) => s + w.comments + w.shares, 0);
+  const totalEng = validER.reduce((s, w) => s + w.likes + w.comments + w.shares, 0);
   const totalViews = validER.reduce((s, w) => s + w.views, 0);
   const engRate = totalViews > 0 ? (totalEng / totalViews) * 100 : 0;
   const engScore = Math.max(0, Math.min(100, (engRate / 0.8) * 100));
@@ -1309,8 +1309,10 @@ function renderFormatSplit(weekly, videos) {
   const shortLikes = shortVideos.reduce((s, v) => s + v.likes, 0);
   const shortComments = shortVideos.reduce((s, v) => s + v.comments, 0);
   
-  const longEngRate = longViews > 0 ? ((longLikes + longComments) / longViews * 100) : 0;
-  const shortEngRate = shortViews > 0 ? ((shortLikes + shortComments) / shortViews * 100) : 0;
+  const longShares = longVideos.reduce((s, v) => s + v.shares, 0);
+  const shortShares = shortVideos.reduce((s, v) => s + v.shares, 0);
+  const longEngRate = longViews > 0 ? ((longLikes + longComments + longShares) / longViews * 100) : 0;
+  const shortEngRate = shortViews > 0 ? ((shortLikes + shortComments + shortShares) / shortViews * 100) : 0;
   
   return `
     <section class="section">
@@ -1399,7 +1401,7 @@ function renderVideoRanking(videos, periodLabel) {
   
   const getVal = (v) => {
     if (bwTab === 'views') return v.views;
-    if (bwTab === 'engagement') return v.views > 0 ? ((v.likes + v.comments) / v.views * 100) : 0;
+    if (bwTab === 'engagement') return v.views > 0 ? ((v.likes + v.comments + v.shares) / v.views * 100) : 0;
     if (bwTab === 'likes') return v.likes;
     return 0;
   };
