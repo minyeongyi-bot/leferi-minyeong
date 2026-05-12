@@ -723,9 +723,39 @@ function getCreator() {
   return DATA.masters[STATE.creatorIdx];
 }
 
-function getCreatorWeekly(cid) {
-  return DATA.weekly
-    .filter(w => w.creator_id === cid)
+function getCreatorWeekly(creator) {
+  const cid = creator.creator_id;
+  const channelId = creator.channel_id;
+  
+  // 1차: creator_id로 매칭
+  let rows = DATA.weekly.filter(w => w.creator_id === cid);
+  
+  // 2차 폴백: creator_id 매칭 실패 시 channel_id로 시도
+  if (rows.length === 0 && channelId) {
+    rows = DATA.weekly.filter(w => w.channel_id === channelId);
+    if (rows.length > 0) {
+      console.warn(`[Fallback] creator_id "${cid}"로 매칭 실패. channel_id "${channelId}"로 ${rows.length}행 매칭됨. 시트의 creator_id 일관성을 확인하세요.`);
+    }
+  }
+  
+  // 같은 week_start 중복 시 합산 병합 (uploads류만 합산, 나머지는 마지막 값)
+  const byWeek = {};
+  rows.forEach(w => {
+    const key = w.week_start || w.week;
+    if (!byWeek[key]) {
+      byWeek[key] = { ...w };
+    } else {
+      // 중복 발견: 누적 컬럼만 합산, 스냅샷 컬럼은 마지막 값 유지
+      ['sub_gained','sub_lost','sub_net','views','views_long','views_short',
+       'watch_time_hr','comments','shares','likes',
+       'uploads_long','uploads_short','uploads_total'].forEach(k => {
+        byWeek[key][k] = (num(byWeek[key][k]) + num(w[k])).toString();
+      });
+      console.warn(`[Duplicate] 중복 주차 ${key} 병합됨 (creator: ${cid})`);
+    }
+  });
+  
+  return Object.values(byWeek)
     .sort((a, b) => (a.week_start || '').localeCompare(b.week_start || ''))
     .map(w => ({
       week_start: w.week_start,
@@ -751,9 +781,28 @@ function getCreatorWeekly(cid) {
     }));
 }
 
-function getCreatorVideos(cid) {
-  return DATA.videos
-    .filter(v => v.creator_id === cid && v.title)
+function getCreatorVideos(creator) {
+  const cid = creator.creator_id;
+  const channelId = creator.channel_id;
+  
+  // 1차: creator_id로 매칭
+  let rows = DATA.videos.filter(v => v.creator_id === cid && v.title);
+  
+  // 2차 폴백: channel_id로
+  if (rows.length === 0 && channelId) {
+    rows = DATA.videos.filter(v => v.channel_id === channelId && v.title);
+  }
+  
+  // video_id 중복 제거 (같은 video_id가 여러 번 들어있으면 첫 번째만)
+  const seen = new Set();
+  rows = rows.filter(v => {
+    if (!v.video_id) return true;
+    if (seen.has(v.video_id)) return false;
+    seen.add(v.video_id);
+    return true;
+  });
+  
+  return rows
     .map(v => ({
       video_id: v.video_id,
       title: v.title,
@@ -900,17 +949,59 @@ function renderDash() {
     return;
   }
   
-  const allWeekly = getCreatorWeekly(creator.creator_id);
+  const allWeekly = getCreatorWeekly(creator);
   const weekly = filterByPeriod(allWeekly);
-  const allVideos = getCreatorVideos(creator.creator_id);
+  const allVideos = getCreatorVideos(creator);
   const videos = filterVideosByPeriodWeeks(allVideos, weekly);
   
   if (weekly.length === 0) {
+    // 진단 정보 - 시트에 뭐가 들어있는지 보여주기
+    const allCidsInWeekly = [...new Set(DATA.weekly.map(w => w.creator_id))].filter(Boolean);
+    const allCidsInVideos = [...new Set(DATA.videos.map(v => v.creator_id))].filter(Boolean);
+    const weeklyHeaders = DATA.weekly.length > 0 ? Object.keys(DATA.weekly[0]) : [];
+    const sampleWeekly = DATA.weekly.length > 0 ? DATA.weekly[0] : null;
+    
     dash.innerHTML = `
       <div class="section">
-        <div class="empty">
-          <strong>${esc(creator.name_ko)}</strong> · 선택한 기간에 주간 데이터가 없습니다.<br/>
-          weekly_metrics 시트를 확인해주세요.
+        <div class="sec-head">
+          <span class="sec-num">DIAGNOSTIC</span>
+          <span class="sec-title">데이터 <em>매칭 실패</em></span>
+        </div>
+        <div class="empty" style="text-align:left;padding:32px;">
+          <div style="font-family:var(--mono);font-size:13px;color:var(--ink);margin-bottom:20px;">
+            <strong>${esc(creator.name_ko)}</strong> (creator_id: <code style="background:var(--bg-card);padding:2px 6px;color:var(--accent);">${esc(creator.creator_id || '(빈 값)')}</code>) 와 일치하는 weekly_metrics 행이 없습니다.
+          </div>
+          
+          <div style="background:var(--bg-card);padding:16px 20px;margin-bottom:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink);">
+            <strong style="color:var(--accent);">📋 creators_master에 있는 creator_id 목록:</strong><br/>
+            ${DATA.masters.map(m => `<code style="background:var(--bg);padding:2px 6px;margin:2px;">${esc(m.creator_id || '(빈 값)')}</code> → ${esc(m.name_ko)}`).join('<br/>')}
+          </div>
+          
+          <div style="background:var(--bg-card);padding:16px 20px;margin-bottom:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink);">
+            <strong style="color:var(--accent);">📋 weekly_metrics 시트의 creator_id 목록 (${DATA.weekly.length}행):</strong><br/>
+            ${allCidsInWeekly.length > 0 
+              ? allCidsInWeekly.map(c => `<code style="background:var(--bg);padding:2px 6px;margin:2px;">${esc(c)}</code>`).join(' ')
+              : '<span style="color:var(--red);">creator_id 컬럼에 값이 없음</span>'}
+          </div>
+          
+          <div style="background:var(--bg-card);padding:16px 20px;margin-bottom:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink);">
+            <strong style="color:var(--accent);">📋 weekly_metrics 컬럼 (${weeklyHeaders.length}개):</strong><br/>
+            ${weeklyHeaders.map(h => `<code style="background:var(--bg);padding:2px 6px;margin:2px;">${esc(h)}</code>`).join(' ')}
+          </div>
+          
+          ${sampleWeekly ? `
+          <div style="background:var(--bg-card);padding:16px 20px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink);">
+            <strong style="color:var(--accent);">📋 weekly_metrics 첫 행 샘플:</strong><br/>
+            <pre style="margin-top:8px;white-space:pre-wrap;word-break:break-all;">${esc(JSON.stringify(sampleWeekly, null, 2))}</pre>
+          </div>
+          ` : ''}
+          
+          <div style="margin-top:20px;padding:14px 18px;background:var(--amber-bg);border-left:3px solid var(--amber);font-family:var(--sans);font-size:13px;line-height:1.6;color:#78350f;">
+            <strong>해결 방법:</strong><br/>
+            1. creators_master의 creator_id와 weekly_metrics의 creator_id가 <strong>정확히 같은지</strong> 확인 (대소문자, 공백 포함)<br/>
+            2. updateAll() 함수를 다시 실행해서 weekly_metrics 시트가 비어있지 않은지 확인<br/>
+            3. weekly_metrics 시트의 첫 행이 헤더(컬럼명)인지 확인
+          </div>
         </div>
       </div>`;
     return;
@@ -937,7 +1028,7 @@ function renderDash() {
     ${renderPentagon(pent)}
     ${renderDiagnosis(pent, creator)}
     ${renderSubscriberFlow(weekly, periodLabel, periodRange)}
-    ${renderWeeklyTrends(weekly, periodLabel)}
+    ${renderWeeklyTrends(weekly, periodLabel, videos)}
     ${renderFormatSplit(weekly, videos)}
     ${renderVideoRanking(videos, periodLabel)}
   `;
@@ -947,8 +1038,8 @@ function renderDash() {
     buildFlowChart(weekly);
     buildViewsChart(weekly);
     buildUploadsChart(weekly);
-    buildVPChart(weekly);
-    buildEngagementChart(weekly);
+    buildVPChart(weekly, videos);
+    buildEngagementChart(weekly, videos);
     buildFormatViewsChart(weekly);
     buildFormatUploadsChart(weekly);
   }, 50);
@@ -1112,12 +1203,13 @@ function renderSubscriberFlow(weekly, periodLabel, periodRange) {
 }
 
 // ============ § 02 주차별 트렌드 ============
-function renderWeeklyTrends(weekly, periodLabel) {
+function renderWeeklyTrends(weekly, periodLabel, videos) {
   const totalViews = weekly.reduce((s, w) => s + w.views, 0);
   const totalWatch = weekly.reduce((s, w) => s + w.watch_time_hr, 0);
-  const validVP = weekly.filter(w => w.avg_view_pct > 0);
-  const avgVP = validVP.length > 0 ? validVP.reduce((s, w) => s + w.avg_view_pct, 0) / validVP.length : 0;
-  const totalEng = weekly.reduce((s, w) => s + w.comments + w.shares + w.likes, 0);
+  const totalComments = weekly.reduce((s, w) => s + w.comments, 0);
+  const totalLikes = weekly.reduce((s, w) => s + w.likes, 0);
+  const totalShares = weekly.reduce((s, w) => s + w.shares, 0);
+  const totalEng = totalComments + totalLikes + totalShares;
   
   return `
     <section class="section">
@@ -1127,7 +1219,7 @@ function renderWeeklyTrends(weekly, periodLabel) {
         <span class="sec-sub">${periodLabel}</span>
       </div>
       
-      <div class="subkpi-grid">
+      <div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);">
         <div class="subkpi">
           <div class="subkpi-name">총 조회수</div>
           <div class="subkpi-val">${fmt.numK(totalViews)}</div>
@@ -1139,21 +1231,16 @@ function renderWeeklyTrends(weekly, periodLabel) {
           <div class="subkpi-sub">주당 ${fmt.numK(totalWatch/weekly.length)}h</div>
         </div>
         <div class="subkpi">
-          <div class="subkpi-name">평균 시청 비율</div>
-          <div class="subkpi-val">${avgVP.toFixed(1)}<span class="unit">%</span></div>
-          <div class="subkpi-sub">avg_view_pct 평균</div>
-        </div>
-        <div class="subkpi">
           <div class="subkpi-name">총 인게이지먼트</div>
           <div class="subkpi-val">${fmt.numK(totalEng)}</div>
-          <div class="subkpi-sub">댓글+공유+좋아요</div>
+          <div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div>
         </div>
       </div>
       
       <div class="chart-grid-2">
         <div class="chart-card">
           <div class="chart-title">주차별 조회수 추이</div>
-          <div class="chart-sub">롱폼 · 숏폼 스택</div>
+          <div class="chart-sub">롱폼 · 숏폼 흐름 비교</div>
           <div class="chart-legend">
             <span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span>
             <span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span>
@@ -1174,12 +1261,29 @@ function renderWeeklyTrends(weekly, periodLabel) {
       <div class="chart-grid-2" style="margin-top:18px;">
         <div class="chart-card">
           <div class="chart-title">평균 시청 비율 추이</div>
-          <div class="chart-sub">avg_view_pct · 콘텐츠 효율 신호</div>
+          <div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div>
+          <div class="chart-legend">
+            <span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span>
+            <span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span>
+            <span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span>
+          </div>
           <div class="chart-canvas"><canvas id="ch-vp"></canvas></div>
         </div>
         <div class="chart-card">
-          <div class="chart-title">인게이지먼트율 추이</div>
-          <div class="chart-sub">engagement_rate · 시청자 반응</div>
+          <div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+            <div class="chart-title">시청자 반응 추이</div>
+            <div class="ctrl-segment" id="eng-filter" style="font-size:9px;">
+              <button data-eng="all" class="active">전체</button>
+              <button data-eng="long">롱폼</button>
+              <button data-eng="short">숏폼</button>
+            </div>
+          </div>
+          <div class="chart-sub">좋아요 · 댓글 · 공유 (절대값)</div>
+          <div class="chart-legend">
+            <span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span>
+            <span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span>
+            <span><span class="lg-dot" style="background:var(--teal);"></span>공유</span>
+          </div>
           <div class="chart-canvas"><canvas id="ch-eng"></canvas></div>
         </div>
       </div>
@@ -1497,99 +1601,183 @@ function buildFlowChart(weekly) {
   });
 }
 
+// 주차별 조회수 - 롱폼/숏폼 꺾은선
 function buildViewsChart(weekly) {
   const ctx = document.getElementById('ch-views');
   if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
   
   charts.views = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
       labels,
       datasets: [
         {
           label: '롱폼',
           data: weekly.map(w => w.views_long),
-          backgroundColor: '#534AB7',
-          borderWidth: 0,
+          borderColor: '#534AB7',
+          backgroundColor: 'rgba(83,74,183,0.08)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          fill: false,
         },
         {
           label: '숏폼',
           data: weekly.map(w => w.views_short),
-          backgroundColor: '#D85A30',
-          borderWidth: 0,
+          borderColor: '#D85A30',
+          backgroundColor: 'rgba(216,90,48,0.08)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          fill: false,
         }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, stacked: true },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, stacked: true, beginAtZero: true }
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, beginAtZero: true }
       }
     }
   });
 }
 
+// 주차별 업로드 - 롱폼/숏폼 꺾은선
 function buildUploadsChart(weekly) {
   const ctx = document.getElementById('ch-uploads');
   if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
   
   charts.uploads = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
       labels,
       datasets: [
         {
           label: '롱폼',
           data: weekly.map(w => w.uploads_long),
-          backgroundColor: '#534AB7',
-          borderWidth: 0,
+          borderColor: '#534AB7',
+          backgroundColor: 'rgba(83,74,183,0.08)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          fill: false,
         },
         {
           label: '숏폼',
           data: weekly.map(w => w.uploads_short),
-          backgroundColor: '#D85A30',
-          borderWidth: 0,
+          borderColor: '#D85A30',
+          backgroundColor: 'rgba(216,90,48,0.08)',
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 3,
+          pointHoverRadius: 5,
+          fill: false,
         }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, stacked: true },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1 }, stacked: true, beginAtZero: true }
+        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
+        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1 }, beginAtZero: true }
       }
     }
   });
 }
 
-function buildVPChart(weekly) {
+// 평균 시청 비율 - 롱폼/숏폼 가중평균
+// videos 시트의 영상별 데이터로 주차별 가중평균 계산
+// 영상별 avg_view_pct가 없으면 weekly의 채널 평균만 회색 점선으로 표시
+function buildVPChart(weekly, videos) {
   const ctx = document.getElementById('ch-vp');
   if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
   
+  // 주차별로 video_type별 가중평균 avg_view_pct 계산
+  // 영상별 avg_view_pct가 없는 경우(현재 데이터 상태) → 해당 주차의 채널 avg_view_pct로 폴백
+  const longVP = [];
+  const shortVP = [];
+  const channelVP = [];
+  
+  weekly.forEach(w => {
+    const wkVideos = videos.filter(v => v.week_label === w.week_label);
+    const longVids = wkVideos.filter(v => v.video_type === 'long');
+    const shortVids = wkVideos.filter(v => v.video_type === 'short');
+    
+    // 영상별 avg_view_pct가 있는 경우 가중평균 시도
+    // (현재 시트에는 영상별 avg_view_pct 컬럼 없음 → 채널 평균으로 폴백)
+    const calcWeightedVP = (vids) => {
+      const valid = vids.filter(v => v.avg_view_pct && v.views > 0);
+      if (valid.length === 0) return null;
+      const totalViews = valid.reduce((s, v) => s + v.views, 0);
+      const weighted = valid.reduce((s, v) => s + (v.avg_view_pct * v.views), 0);
+      return totalViews > 0 ? weighted / totalViews : null;
+    };
+    
+    longVP.push(calcWeightedVP(longVids));
+    shortVP.push(calcWeightedVP(shortVids));
+    channelVP.push(w.avg_view_pct || null);
+  });
+  
+  // 영상별 avg_view_pct가 전부 null이면 (현재 상태) → 채널 평균만 보여줌
+  const hasLongData = longVP.some(v => v !== null);
+  const hasShortData = shortVP.some(v => v !== null);
+  
+  const datasets = [];
+  
+  if (hasLongData) {
+    datasets.push({
+      label: '롱폼',
+      data: longVP,
+      borderColor: '#534AB7',
+      backgroundColor: 'rgba(83,74,183,0.08)',
+      tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false, spanGaps: true,
+    });
+  }
+  if (hasShortData) {
+    datasets.push({
+      label: '숏폼',
+      data: shortVP,
+      borderColor: '#D85A30',
+      backgroundColor: 'rgba(216,90,48,0.08)',
+      tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false, spanGaps: true,
+    });
+  }
+  
+  // 채널 평균은 항상 표시 (참고선)
+  datasets.push({
+    label: '채널 평균',
+    data: channelVP,
+    borderColor: '#9c968a',
+    backgroundColor: 'transparent',
+    tension: 0.3, borderWidth: 1.5, pointRadius: 2, fill: false, 
+    borderDash: [4, 3], spanGaps: true,
+  });
+  
   charts.vp = new Chart(ctx, {
     type: 'line',
-    data: {
-      labels,
-      datasets: [{
-        label: 'avg_view_pct',
-        data: weekly.map(w => w.avg_view_pct || null),
-        borderColor: '#1D9E75',
-        backgroundColor: 'rgba(29,158,117,0.1)',
-        tension: 0.3,
-        fill: true,
-        pointRadius: 2,
-        spanGaps: true,
-      }]
-    },
+    data: { labels, datasets },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: { 
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw == null ? '데이터 없음' : ctx.raw.toFixed(1) + '%')
+          }
+        }
+      },
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
         y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v + '%' }, beginAtZero: true }
@@ -1598,32 +1786,94 @@ function buildVPChart(weekly) {
   });
 }
 
-function buildEngagementChart(weekly) {
+// 인게이지먼트(좋아요/댓글/공유 절대값) - 전체/롱폼/숏폼 필터
+let engFilter = 'all';
+
+function buildEngagementChart(weekly, videos) {
   const ctx = document.getElementById('ch-eng');
   if (!ctx) return;
+  
+  // 필터 버튼 바인딩
+  document.querySelectorAll('#eng-filter button').forEach(btn => {
+    btn.onclick = () => {
+      engFilter = btn.dataset.eng;
+      document.querySelectorAll('#eng-filter button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // 차트만 다시 그림
+      if (charts.eng) charts.eng.destroy();
+      buildEngagementChart(weekly, videos);
+    };
+  });
+  
   const labels = weekly.map(w => w.week_label);
+  
+  // 필터에 따라 데이터 계산
+  let likes, comments, shares;
+  
+  if (engFilter === 'all') {
+    // weekly 시트의 전체 값 사용
+    likes = weekly.map(w => w.likes);
+    comments = weekly.map(w => w.comments);
+    shares = weekly.map(w => w.shares);
+  } else {
+    // videos 시트에서 video_type별 주차 합산
+    const targetType = engFilter; // 'long' or 'short'
+    likes = weekly.map(w => {
+      const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
+      return wkVids.reduce((s, v) => s + v.likes, 0);
+    });
+    comments = weekly.map(w => {
+      const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
+      return wkVids.reduce((s, v) => s + v.comments, 0);
+    });
+    shares = weekly.map(w => {
+      const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
+      return wkVids.reduce((s, v) => s + v.shares, 0);
+    });
+  }
   
   charts.eng = new Chart(ctx, {
     type: 'line',
     data: {
       labels,
-      datasets: [{
-        label: 'engagement_rate',
-        data: weekly.map(w => w.engagement_rate || null),
-        borderColor: '#BA7517',
-        backgroundColor: 'rgba(186,117,23,0.1)',
-        tension: 0.3,
-        fill: true,
-        pointRadius: 2,
-        spanGaps: true,
-      }]
+      datasets: [
+        {
+          label: '좋아요',
+          data: likes,
+          borderColor: '#D4537E',
+          backgroundColor: 'rgba(212,83,126,0.08)',
+          tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false,
+        },
+        {
+          label: '댓글',
+          data: comments,
+          borderColor: '#185FA5',
+          backgroundColor: 'rgba(24,95,165,0.08)',
+          tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false,
+        },
+        {
+          label: '공유',
+          data: shares,
+          borderColor: '#1D9E75',
+          backgroundColor: 'rgba(29,158,117,0.08)',
+          tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false,
+        }
+      ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
+      interaction: { mode: 'index', intersect: false },
+      plugins: { 
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.dataset.label + ': ' + fmt.num(ctx.raw)
+          }
+        }
+      },
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v.toFixed(2) + '%' }, beginAtZero: true }
+        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, beginAtZero: true }
       }
     }
   });
