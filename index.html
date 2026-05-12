@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Creator Performance LAB · v13</title>
+<title>Creator Performance LAB · v13 (Phase A)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -568,7 +568,7 @@ html, body {
 <main id="dash"></main>
 
 <footer class="foot">
-  <span>Creator Performance LAB · v13</span>
+  <span>Creator Performance LAB · v13 (Phase A)</span>
   <span id="footer-meta"></span>
 </footer>
 
@@ -863,11 +863,13 @@ function computePentagon(creator, weekly) {
   const effScore = Math.max(0, Math.min(100, (avgVP / 40) * 100));
   
   // ④ 인게이지먼트: engagement_rate (0.8% = 100점)
+  // ============ PHASE A 패치: likes 포함 ============
   const validER = weekly.filter(w => w.views > 0);
   const totalEng = validER.reduce((s, w) => s + w.likes + w.comments + w.shares, 0);
   const totalViews = validER.reduce((s, w) => s + w.views, 0);
   const engRate = totalViews > 0 ? (totalEng / totalViews) * 100 : 0;
   const engScore = Math.max(0, Math.min(100, (engRate / 0.8) * 100));
+  // ============================================
   
   // ⑤ 충성도: returning_viewer_pct (50% = 100점, 없으면 SPV 프록시)
   const validRV = weekly.filter(w => w.returning_viewer_pct > 0);
@@ -1306,13 +1308,15 @@ function renderFormatSplit(weekly, videos) {
   
   const longLikes = longVideos.reduce((s, v) => s + v.likes, 0);
   const longComments = longVideos.reduce((s, v) => s + v.comments, 0);
+  const longShares = longVideos.reduce((s, v) => s + v.shares, 0);
   const shortLikes = shortVideos.reduce((s, v) => s + v.likes, 0);
   const shortComments = shortVideos.reduce((s, v) => s + v.comments, 0);
-  
-  const longShares = longVideos.reduce((s, v) => s + v.shares, 0);
   const shortShares = shortVideos.reduce((s, v) => s + v.shares, 0);
+  
+  // ============ PHASE A 패치: shares 포함 ============
   const longEngRate = longViews > 0 ? ((longLikes + longComments + longShares) / longViews * 100) : 0;
   const shortEngRate = shortViews > 0 ? ((shortLikes + shortComments + shortShares) / shortViews * 100) : 0;
+  // ============================================
   
   return `
     <section class="section">
@@ -1401,7 +1405,9 @@ function renderVideoRanking(videos, periodLabel) {
   
   const getVal = (v) => {
     if (bwTab === 'views') return v.views;
+    // ============ PHASE A 패치: shares 포함 ============
     if (bwTab === 'engagement') return v.views > 0 ? ((v.likes + v.comments + v.shares) / v.views * 100) : 0;
+    // ============================================
     if (bwTab === 'likes') return v.likes;
     return 0;
   };
@@ -1698,15 +1704,11 @@ function buildUploadsChart(weekly) {
 }
 
 // 평균 시청 비율 - 롱폼/숏폼 가중평균
-// videos 시트의 영상별 데이터로 주차별 가중평균 계산
-// 영상별 avg_view_pct가 없으면 weekly의 채널 평균만 회색 점선으로 표시
 function buildVPChart(weekly, videos) {
   const ctx = document.getElementById('ch-vp');
   if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
   
-  // 주차별로 video_type별 가중평균 avg_view_pct 계산
-  // 영상별 avg_view_pct가 없는 경우(현재 데이터 상태) → 해당 주차의 채널 avg_view_pct로 폴백
   const longVP = [];
   const shortVP = [];
   const channelVP = [];
@@ -1716,8 +1718,6 @@ function buildVPChart(weekly, videos) {
     const longVids = wkVideos.filter(v => v.video_type === 'long');
     const shortVids = wkVideos.filter(v => v.video_type === 'short');
     
-    // 영상별 avg_view_pct가 있는 경우 가중평균 시도
-    // (현재 시트에는 영상별 avg_view_pct 컬럼 없음 → 채널 평균으로 폴백)
     const calcWeightedVP = (vids) => {
       const valid = vids.filter(v => v.avg_view_pct && v.views > 0);
       if (valid.length === 0) return null;
@@ -1731,7 +1731,6 @@ function buildVPChart(weekly, videos) {
     channelVP.push(w.avg_view_pct || null);
   });
   
-  // 영상별 avg_view_pct가 전부 null이면 (현재 상태) → 채널 평균만 보여줌
   const hasLongData = longVP.some(v => v !== null);
   const hasShortData = shortVP.some(v => v !== null);
   
@@ -1756,7 +1755,6 @@ function buildVPChart(weekly, videos) {
     });
   }
   
-  // 채널 평균은 항상 표시 (참고선)
   datasets.push({
     label: '채널 평균',
     data: channelVP,
@@ -1788,20 +1786,17 @@ function buildVPChart(weekly, videos) {
   });
 }
 
-// 인게이지먼트(좋아요/댓글/공유 절대값) - 전체/롱폼/숏폼 필터
 let engFilter = 'all';
 
 function buildEngagementChart(weekly, videos) {
   const ctx = document.getElementById('ch-eng');
   if (!ctx) return;
   
-  // 필터 버튼 바인딩
   document.querySelectorAll('#eng-filter button').forEach(btn => {
     btn.onclick = () => {
       engFilter = btn.dataset.eng;
       document.querySelectorAll('#eng-filter button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      // 차트만 다시 그림
       if (charts.eng) charts.eng.destroy();
       buildEngagementChart(weekly, videos);
     };
@@ -1809,17 +1804,14 @@ function buildEngagementChart(weekly, videos) {
   
   const labels = weekly.map(w => w.week_label);
   
-  // 필터에 따라 데이터 계산
   let likes, comments, shares;
   
   if (engFilter === 'all') {
-    // weekly 시트의 전체 값 사용
     likes = weekly.map(w => w.likes);
     comments = weekly.map(w => w.comments);
     shares = weekly.map(w => w.shares);
   } else {
-    // videos 시트에서 video_type별 주차 합산
-    const targetType = engFilter; // 'long' or 'short'
+    const targetType = engFilter;
     likes = weekly.map(w => {
       const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
       return wkVids.reduce((s, v) => s + v.likes, 0);
