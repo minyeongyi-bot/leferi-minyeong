@@ -3,515 +3,229 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Creator Performance LAB · v13 (Phase A)</title>
+<title>Creator Performance LAB · v14</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Pretendard:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg: #ffffff;
-  --bg-soft: #faf9f6;
-  --bg-card: #f5f3ed;
-  --line: #e5e1d8;
-  --line-soft: #efece4;
-  --ink: #1a1815;
-  --ink-soft: #5a554d;
-  --ink-mute: #9c968a;
-  --accent: #b8860b;
-  --accent-bg: #faf3e3;
-  --green: #15803d;
-  --green-bg: #ecfdf5;
-  --red: #b91c1c;
-  --red-bg: #fee2e2;
-  --amber: #d97706;
-  --amber-bg: #fef3c7;
-  --blue: #185FA5;
-  --purple: #534AB7;
-  --orange: #D85A30;
-  --teal: #1D9E75;
-  --pink: #D4537E;
+  --bg: #ffffff; --bg-soft: #faf9f6; --bg-card: #f5f3ed;
+  --line: #e5e1d8; --line-soft: #efece4;
+  --ink: #1a1815; --ink-soft: #5a554d; --ink-mute: #9c968a;
+  --accent: #b8860b; --accent-bg: #faf3e3;
+  --green: #15803d; --green-bg: #ecfdf5;
+  --red: #b91c1c; --red-bg: #fee2e2;
+  --amber: #d97706; --amber-bg: #fef3c7;
+  --blue: #185FA5; --purple: #534AB7; --orange: #D85A30;
+  --teal: #1D9E75; --pink: #D4537E;
   --serif: 'Fraunces', 'Pretendard', serif;
   --sans: 'Pretendard', -apple-system, sans-serif;
   --mono: 'JetBrains Mono', monospace;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 14px;
-  line-height: 1.5;
-  letter-spacing: -0.005em;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ============ LOADING ============ */
-#loading {
-  position: fixed; inset: 0; background: var(--bg); z-index: 99999;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-#loading .title {
-  font-family: var(--serif); font-size: 26px; font-weight: 500;
-  font-style: italic; letter-spacing: -0.02em; margin-bottom: 10px;
-}
-#loading .sub {
-  font-family: var(--mono); font-size: 11px; color: var(--ink-mute);
-  letter-spacing: 0.12em; text-transform: uppercase;
-}
-#loading .spinner {
-  width: 32px; height: 32px; border: 2px solid var(--line);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin 0.8s linear infinite; margin-top: 20px;
-}
+html, body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; letter-spacing: -0.005em; -webkit-font-smoothing: antialiased; }
+#loading { position: fixed; inset: 0; background: var(--bg); z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#loading .title { font-family: var(--serif); font-size: 26px; font-weight: 500; font-style: italic; letter-spacing: -0.02em; margin-bottom: 10px; }
+#loading .sub { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); letter-spacing: 0.12em; text-transform: uppercase; }
+#loading .spinner { width: 32px; height: 32px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-top: 20px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-/* ============ MASTHEAD ============ */
-.masthead {
-  border-bottom: 2px solid var(--ink);
-  padding: 28px 48px 22px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-.eyebrow {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--accent); font-weight: 500; margin-bottom: 6px;
-}
-.masthead h1 {
-  font-family: var(--serif); font-weight: 400; font-size: 32px;
-  letter-spacing: -0.025em; font-style: italic; line-height: 1;
-}
+.masthead { border-bottom: 2px solid var(--ink); padding: 28px 48px 22px; display: flex; justify-content: space-between; align-items: flex-end; }
+.eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 6px; }
+.masthead h1 { font-family: var(--serif); font-weight: 400; font-size: 32px; letter-spacing: -0.025em; font-style: italic; line-height: 1; }
 .masthead h1 em { font-style: normal; font-weight: 600; }
-.masthead-right {
-  font-family: var(--mono); font-size: 10px; color: var(--ink-mute);
-  text-align: right; line-height: 1.7;
-}
+.masthead-right { font-family: var(--mono); font-size: 10px; color: var(--ink-mute); text-align: right; line-height: 1.7; }
 
-/* ============ CONTROLS BAR ============ */
-.controls {
-  background: var(--bg-soft);
-  border-bottom: 1px solid var(--line);
-  padding: 14px 48px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-}
+/* v14 신규: 뷰 토글 */
+.view-toggle { border-bottom: 1px solid var(--line); padding: 0 48px; display: flex; gap: 0; background: var(--bg); }
+.vt-btn { background: transparent; border: none; font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 16px 22px; cursor: pointer; color: var(--ink-mute); border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; align-items: baseline; gap: 8px; letter-spacing: -0.01em; }
+.vt-btn:hover { color: var(--ink); }
+.vt-btn.active { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+.vt-btn .vt-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
+.vt-btn.active .vt-sub { color: var(--accent); }
+.vt-icon { font-size: 13px; margin-right: 2px; color: var(--ink-mute); }
+.vt-btn.active .vt-icon { color: var(--accent); }
+.vt-meta { margin-left: auto; font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.05em; align-self: center; }
+
+.controls { background: var(--bg-soft); border-bottom: 1px solid var(--line); padding: 14px 48px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 .ctrl-group { display: flex; align-items: center; gap: 10px; }
-.ctrl-label {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink-mute); font-weight: 500;
-}
-.ctrl-segment {
-  display: inline-flex;
-  border: 1px solid var(--ink);
-}
-.ctrl-segment button {
-  background: transparent; border: none;
-  border-right: 1px solid var(--ink);
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.12em; padding: 6px 12px;
-  cursor: pointer; color: var(--ink); font-weight: 500;
-  text-transform: uppercase;
-}
+.ctrl-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; }
+.ctrl-segment { display: inline-flex; border: 1px solid var(--ink); }
+.ctrl-segment button { background: transparent; border: none; border-right: 1px solid var(--ink); font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; padding: 6px 12px; cursor: pointer; color: var(--ink); font-weight: 500; text-transform: uppercase; }
 .ctrl-segment button:last-child { border-right: none; }
 .ctrl-segment button:hover { background: var(--bg-card); }
-.ctrl-segment button.active {
-  background: var(--ink); color: var(--bg); font-weight: 600;
-}
-.ctrl-status {
-  margin-left: auto;
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink-mute); letter-spacing: 0.08em;
-}
-.ctrl-status .dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--green); animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
+.ctrl-segment button.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+.ctrl-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.08em; }
+.ctrl-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-/* ============ HERO ============ */
-.hero {
-  padding: 36px 48px 32px;
-  border-bottom: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 32px;
-  align-items: center;
-}
+.hero { padding: 36px 48px 32px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: center; }
 .hero-id { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-.hero-label-pill {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  background: var(--ink); color: var(--bg);
-  padding: 4px 10px; font-weight: 500;
-}
-.hero-name {
-  font-family: var(--serif); font-weight: 600; font-size: 34px;
-  letter-spacing: -0.025em; line-height: 1;
-}
-.hero-handle {
-  font-family: var(--mono); font-size: 12px; color: var(--ink-mute);
-  letter-spacing: 0.02em;
-}
-.hero-stats {
-  display: flex; gap: 28px; align-items: baseline; margin-top: 14px;
-  font-family: var(--mono); font-size: 11px; color: var(--ink-soft);
-}
-.hero-stats .stat-val {
-  color: var(--ink); font-weight: 600; font-size: 14px;
-  font-family: var(--serif); margin-left: 6px;
-}
-
-/* ============ HEALTH SCORE (메인 KPI) ============ */
-.health-block {
-  display: flex; flex-direction: column; align-items: flex-end;
-  gap: 6px;
-}
-.health-eyebrow {
-  font-family: var(--mono); font-size: 9px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink-mute);
-}
-.health-grade-row {
-  display: flex; align-items: baseline; gap: 14px;
-}
-.health-score {
-  font-family: var(--serif); font-size: 72px;
-  font-weight: 600; line-height: 1; letter-spacing: -0.04em;
-}
-.health-score .max {
-  font-family: var(--mono); font-size: 16px;
-  color: var(--ink-mute); font-weight: 400;
-  margin-left: 2px;
-}
-.health-badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 6px 14px; font-family: var(--mono); font-size: 11px;
-  font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
-  border: 1.5px solid;
-}
+.hero-label-pill { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; background: var(--ink); color: var(--bg); padding: 4px 10px; font-weight: 500; }
+.hero-name { font-family: var(--serif); font-weight: 600; font-size: 34px; letter-spacing: -0.025em; line-height: 1; }
+.hero-handle { font-family: var(--mono); font-size: 12px; color: var(--ink-mute); letter-spacing: 0.02em; }
+.hero-stats { display: flex; gap: 28px; align-items: baseline; margin-top: 14px; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
+.hero-stats .stat-val { color: var(--ink); font-weight: 600; font-size: 14px; font-family: var(--serif); margin-left: 6px; }
+.health-block { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.health-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); }
+.health-grade-row { display: flex; align-items: baseline; gap: 14px; }
+.health-score { font-family: var(--serif); font-size: 72px; font-weight: 600; line-height: 1; letter-spacing: -0.04em; }
+.health-score .max { font-family: var(--mono); font-size: 16px; color: var(--ink-mute); font-weight: 400; margin-left: 2px; }
+.health-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; border: 1.5px solid; }
 .health-badge.healthy { color: var(--green); border-color: var(--green); background: var(--green-bg); }
 .health-badge.watch { color: var(--amber); border-color: var(--amber); background: var(--amber-bg); }
 .health-badge.high { color: var(--red); border-color: var(--red); background: var(--red-bg); }
-.health-badge .bdot {
-  width: 7px; height: 7px; border-radius: 50%;
-}
+.health-badge .bdot { width: 7px; height: 7px; border-radius: 50%; }
 .health-badge.healthy .bdot { background: var(--green); }
 .health-badge.watch .bdot { background: var(--amber); }
 .health-badge.high .bdot { background: var(--red); animation: pulse 1.5s infinite; }
 
-/* ============ 5축 미니 카드 ============ */
-.pentagon-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  border-bottom: 1px solid var(--line);
-}
-.pent-cell {
-  padding: 22px 26px;
-  border-right: 1px solid var(--line);
-}
+.pentagon-row { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); }
+.pent-cell { padding: 22px 26px; border-right: 1px solid var(--line); }
 .pent-cell:last-child { border-right: none; }
-.pent-name {
-  font-family: var(--mono); font-size: 9px;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink-mute); margin-bottom: 8px;
-}
-.pent-score {
-  font-family: var(--serif); font-size: 34px; font-weight: 500;
-  line-height: 1; letter-spacing: -0.02em;
-}
-.pent-score.good { color: var(--green); }
-.pent-score.mid { color: var(--amber); }
-.pent-score.low { color: var(--red); }
-.pent-bar {
-  margin-top: 10px; height: 3px; background: var(--bg-card);
-  overflow: hidden;
-}
+.pent-name { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
+.pent-score { font-family: var(--serif); font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
+.pent-score.good { color: var(--green); } .pent-score.mid { color: var(--amber); } .pent-score.low { color: var(--red); }
+.pent-bar { margin-top: 10px; height: 3px; background: var(--bg-card); overflow: hidden; }
 .pent-bar-fill { height: 100%; transition: width 0.6s ease; }
-.pent-bar-fill.good { background: var(--green); }
-.pent-bar-fill.mid { background: var(--amber); }
-.pent-bar-fill.low { background: var(--red); }
-.pent-sub {
-  font-family: var(--mono); font-size: 10px; color: var(--ink-soft);
-  margin-top: 8px; line-height: 1.5;
-}
+.pent-bar-fill.good { background: var(--green); } .pent-bar-fill.mid { background: var(--amber); } .pent-bar-fill.low { background: var(--red); }
+.pent-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-soft); margin-top: 8px; line-height: 1.5; }
 
-/* ============ SECTION ============ */
-.section {
-  padding: 48px 48px;
-  border-bottom: 1px solid var(--line);
-}
-.sec-head {
-  display: flex; align-items: baseline; gap: 16px;
-  margin-bottom: 24px; padding-bottom: 12px;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-}
-.sec-num {
-  font-family: var(--mono); font-size: 11px;
-  letter-spacing: 0.22em; color: var(--accent); font-weight: 500;
-}
-.sec-title {
-  font-family: var(--serif); font-size: 26px; font-weight: 400;
-  letter-spacing: -0.025em; font-style: italic;
-}
+.section { padding: 48px 48px; border-bottom: 1px solid var(--line); }
+.sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.sec-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; color: var(--accent); font-weight: 500; }
+.sec-title { font-family: var(--serif); font-size: 26px; font-weight: 400; letter-spacing: -0.025em; font-style: italic; }
 .sec-title em { font-style: normal; font-weight: 600; }
-.sec-sub {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink-mute); margin-left: auto;
-  letter-spacing: 0.05em;
-}
+.sec-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-mute); margin-left: auto; letter-spacing: 0.05em; }
 
-/* ============ SUB KPI ============ */
-.subkpi-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 1px; background: var(--line);
-  border: 1px solid var(--line);
-  margin-bottom: 28px;
-}
-.subkpi {
-  background: var(--bg); padding: 18px 22px;
-}
-.subkpi-name {
-  font-family: var(--mono); font-size: 9px;
-  letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--ink-mute); margin-bottom: 8px;
-}
-.subkpi-val {
-  font-family: var(--serif); font-size: 26px; font-weight: 500;
-  line-height: 1; letter-spacing: -0.02em;
-}
-.subkpi-val.pos { color: var(--green); }
-.subkpi-val.neg { color: var(--red); }
-.subkpi-val .unit {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--ink-mute); font-weight: 400; margin-left: 3px;
-}
-.subkpi-sub {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink-soft); margin-top: 6px;
-}
+.subkpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 28px; }
+.subkpi { background: var(--bg); padding: 18px 22px; }
+.subkpi-name { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
+.subkpi-val { font-family: var(--serif); font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
+.subkpi-val.pos { color: var(--green); } .subkpi-val.neg { color: var(--red); }
+.subkpi-val .unit { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); font-weight: 400; margin-left: 3px; }
+.subkpi-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-soft); margin-top: 6px; }
 
-/* ============ CHART CARDS ============ */
-.chart-card {
-  background: var(--bg);
-  border: 1px solid var(--line);
-  padding: 22px 24px;
-}
+.chart-card { background: var(--bg); border: 1px solid var(--line); padding: 22px 24px; }
 .chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .chart-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
-.chart-title {
-  font-family: var(--serif); font-size: 15px; font-weight: 600;
-  font-style: italic; margin-bottom: 3px;
-}
-.chart-sub {
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink-mute); margin-bottom: 14px;
-}
-.chart-canvas {
-  position: relative; height: 240px;
-}
+.chart-title { font-family: var(--serif); font-size: 15px; font-weight: 600; font-style: italic; margin-bottom: 3px; }
+.chart-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-mute); margin-bottom: 14px; }
+.chart-canvas { position: relative; height: 240px; }
 .chart-canvas.tall { height: 300px; }
 .chart-canvas.short { height: 180px; }
-.chart-legend {
-  display: flex; flex-wrap: wrap; gap: 14px;
-  font-family: var(--mono); font-size: 10px;
-  color: var(--ink-soft); margin-bottom: 12px;
-}
-.lg-dot {
-  display: inline-block; width: 10px; height: 10px;
-  border-radius: 1px; margin-right: 5px; vertical-align: middle;
-}
+.chart-legend { display: flex; flex-wrap: wrap; gap: 14px; font-family: var(--mono); font-size: 10px; color: var(--ink-soft); margin-bottom: 12px; }
+.lg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 1px; margin-right: 5px; vertical-align: middle; }
 
-/* ============ FLOW (구독자 흐름) ============ */
-.flow-grid {
-  display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 1px; background: var(--line);
-  border: 1px solid var(--line);
-  margin-bottom: 24px;
-}
-.flow-cell {
-  background: var(--bg); padding: 22px 26px;
-  border-left: 3px solid transparent;
-}
-.flow-cell.gained { border-left-color: var(--green); }
-.flow-cell.lost { border-left-color: var(--red); }
-.flow-cell.net { border-left-color: var(--ink); }
-.flow-name {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--ink-mute); margin-bottom: 10px;
-}
-.flow-val {
-  font-family: var(--serif); font-size: 36px; font-weight: 500;
-  line-height: 1; letter-spacing: -0.025em;
-}
-.flow-val.pos { color: var(--green); }
-.flow-val.neg { color: var(--red); }
-.flow-sub {
-  font-family: var(--mono); font-size: 11px;
-  color: var(--ink-soft); margin-top: 8px;
-}
+.flow-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 24px; }
+.flow-cell { background: var(--bg); padding: 22px 26px; border-left: 3px solid transparent; }
+.flow-cell.gained { border-left-color: var(--green); } .flow-cell.lost { border-left-color: var(--red); } .flow-cell.net { border-left-color: var(--ink); }
+.flow-name { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 10px; }
+.flow-val { font-family: var(--serif); font-size: 36px; font-weight: 500; line-height: 1; letter-spacing: -0.025em; }
+.flow-val.pos { color: var(--green); } .flow-val.neg { color: var(--red); }
+.flow-sub { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); margin-top: 8px; }
 
-/* ============ FORMAT (롱폼 vs 숏폼) ============ */
-.fmt-grid {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 1px; background: var(--line);
-  border: 1px solid var(--line);
-}
+.fmt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); }
 .fmt-cell { background: var(--bg); padding: 26px 30px; }
-.fmt-eyebrow {
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.22em; text-transform: uppercase;
-  color: var(--ink-mute); margin-bottom: 4px;
-}
-.fmt-name {
-  font-family: var(--serif); font-size: 28px; font-weight: 500;
-  font-style: italic; letter-spacing: -0.025em;
-  margin-bottom: 18px; padding-bottom: 14px;
-  border-bottom: 1px solid var(--line-soft);
-}
-.fmt-name.long { color: var(--purple); }
-.fmt-name.short { color: var(--orange); }
-.fmt-row {
-  display: flex; justify-content: space-between;
-  align-items: baseline; padding: 9px 0;
-  border-bottom: 1px solid var(--line-soft);
-}
+.fmt-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 4px; }
+.fmt-name { font-family: var(--serif); font-size: 28px; font-weight: 500; font-style: italic; letter-spacing: -0.025em; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line-soft); }
+.fmt-name.long { color: var(--purple); } .fmt-name.short { color: var(--orange); }
+.fmt-row { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--line-soft); }
 .fmt-row:last-child { border-bottom: none; }
 .fmt-row .metric { font-size: 12.5px; color: var(--ink-soft); }
-.fmt-row .value {
-  font-family: var(--mono); font-size: 14px; font-weight: 600;
-}
-.fmt-row .winner {
-  font-family: var(--mono); font-size: 9px;
-  background: var(--ink); color: var(--bg);
-  padding: 1px 5px; margin-left: 6px;
-  letter-spacing: 0.12em;
-}
+.fmt-row .value { font-family: var(--mono); font-size: 14px; font-weight: 600; }
+.fmt-row .winner { font-family: var(--mono); font-size: 9px; background: var(--ink); color: var(--bg); padding: 1px 5px; margin-left: 6px; letter-spacing: 0.12em; }
 
-/* ============ TABLE ============ */
-.tbl {
-  width: 100%; border-collapse: collapse; font-size: 12px;
-}
-.tbl th {
-  font-family: var(--mono); font-size: 9px;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--ink-mute); text-align: left;
-  padding: 10px 8px; border-bottom: 1.5px solid var(--ink);
-  font-weight: 600;
-}
+.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tbl th { font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); text-align: left; padding: 10px 8px; border-bottom: 1.5px solid var(--ink); font-weight: 600; }
 .tbl th.num { text-align: right; }
-.tbl td {
-  padding: 11px 8px;
-  border-bottom: 1px solid var(--line-soft);
-  color: var(--ink-soft);
-}
-.tbl td.num {
-  font-family: var(--mono); text-align: right;
-  font-weight: 600; color: var(--ink);
-}
-.tbl td.title {
-  color: var(--ink); max-width: 320px;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.tbl td.tag {
-  font-family: var(--mono); font-size: 9px;
-  letter-spacing: 0.1em; font-weight: 600;
-  text-transform: uppercase;
-}
-.tbl td.tag.long { color: var(--purple); }
-.tbl td.tag.short { color: var(--orange); }
+.tbl td { padding: 11px 8px; border-bottom: 1px solid var(--line-soft); color: var(--ink-soft); }
+.tbl td.num { font-family: var(--mono); text-align: right; font-weight: 600; color: var(--ink); }
+.tbl td.title { color: var(--ink); max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tbl td.tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; }
+.tbl td.tag.long { color: var(--purple); } .tbl td.tag.short { color: var(--orange); }
 .tbl tr:hover td { background: var(--bg-soft); }
+.tbl-scroll { max-height: 480px; overflow-y: auto; border: 1px solid var(--line); }
+.tbl-scroll thead th { position: sticky; top: 0; background: var(--bg); z-index: 1; box-shadow: 0 1px 0 var(--ink); }
 
-.tbl-scroll {
-  max-height: 480px; overflow-y: auto;
-  border: 1px solid var(--line);
-}
-.tbl-scroll thead th {
-  position: sticky; top: 0; background: var(--bg); z-index: 1;
-  box-shadow: 0 1px 0 var(--ink);
-}
+.bw-tabs { display: flex; gap: 0; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.bw-tab { background: transparent; border: none; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); padding: 10px 16px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; font-weight: 600; }
+.bw-tab.active { color: var(--ink); border-bottom-color: var(--accent); }
+.bw-grid-split { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.bw-col h4 { font-family: var(--serif); font-size: 16px; font-style: italic; font-weight: 600; margin-bottom: 12px; }
+.bw-col.best h4 { color: var(--green); } .bw-col.worst h4 { color: var(--red); }
 
-.bw-tabs {
-  display: flex; gap: 0; margin-bottom: 16px;
-  border-bottom: 1px solid var(--line);
-}
-.bw-tab {
-  background: transparent; border: none;
-  font-family: var(--mono); font-size: 11px;
-  letter-spacing: 0.16em; text-transform: uppercase;
-  color: var(--ink-mute); padding: 10px 16px;
-  cursor: pointer; border-bottom: 2px solid transparent;
-  margin-bottom: -1px; font-weight: 600;
-}
-.bw-tab.active {
-  color: var(--ink); border-bottom-color: var(--accent);
-}
-
-.bw-grid-split {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 28px;
-}
-.bw-col h4 {
-  font-family: var(--serif); font-size: 16px;
-  font-style: italic; font-weight: 600;
-  margin-bottom: 12px;
-}
-.bw-col.best h4 { color: var(--green); }
-.bw-col.worst h4 { color: var(--red); }
-
-/* ============ FOOTER ============ */
-.foot {
-  padding: 32px 48px;
-  font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.12em; color: var(--ink-mute);
-  display: flex; justify-content: space-between;
-  text-transform: uppercase;
-}
-
-/* ============ EMPTY/WARN ============ */
-.empty {
-  padding: 48px; text-align: center; color: var(--ink-mute);
-  font-size: 13px; background: var(--bg-soft);
-  border: 1px dashed var(--line);
-}
-.warn-banner {
-  background: var(--amber-bg);
-  border: 1px solid var(--amber);
-  border-left: 3px solid var(--amber);
-  padding: 10px 14px; margin-bottom: 18px;
-  font-size: 12px; color: #78350f;
-  font-family: var(--mono); letter-spacing: 0.02em;
-}
-
-/* ============ DIAGNOSIS ============ */
-.diagnosis {
-  margin-top: 24px; padding: 16px 22px;
-  background: var(--bg-soft);
-  border-left: 3px solid var(--ink);
-  font-family: var(--serif); font-size: 15px;
-  font-style: italic; line-height: 1.6;
-}
-.diagnosis.healthy { border-left-color: var(--green); }
-.diagnosis.watch { border-left-color: var(--amber); }
-.diagnosis.high { border-left-color: var(--red); }
-.diag-tag {
-  font-family: var(--mono); font-size: 10px;
-  font-weight: 700; letter-spacing: 0.16em;
-  text-transform: uppercase; margin-right: 10px;
-  font-style: normal;
-}
+.foot { padding: 32px 48px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--ink-mute); display: flex; justify-content: space-between; text-transform: uppercase; }
+.empty { padding: 48px; text-align: center; color: var(--ink-mute); font-size: 13px; background: var(--bg-soft); border: 1px dashed var(--line); }
+.warn-banner { background: var(--amber-bg); border: 1px solid var(--amber); border-left: 3px solid var(--amber); padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #78350f; font-family: var(--mono); letter-spacing: 0.02em; }
+.diagnosis { margin-top: 24px; padding: 16px 22px; background: var(--bg-soft); border-left: 3px solid var(--ink); font-family: var(--serif); font-size: 15px; font-style: italic; line-height: 1.6; }
+.diagnosis.healthy { border-left-color: var(--green); } .diagnosis.watch { border-left-color: var(--amber); } .diagnosis.high { border-left-color: var(--red); }
+.diag-tag { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; margin-right: 10px; font-style: normal; }
 .diagnosis strong { font-weight: 600; font-style: normal; }
+
+/* v14 §A 매트릭스 */
+.matrix-wrap { border: 1px solid var(--line); background: var(--bg); margin-bottom: 18px; }
+.matrix-table { width: 100%; border-collapse: collapse; }
+.matrix-table thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; text-align: center; padding: 18px 12px; border-bottom: 1.5px solid var(--ink); }
+.matrix-table thead th.row-head { text-align: left; padding-left: 24px; width: 160px; }
+.matrix-table tbody td { text-align: center; padding: 26px 12px; border-bottom: 1px solid var(--line-soft); font-family: var(--mono); vertical-align: middle; }
+.matrix-table tbody tr:last-child td { border-bottom: none; }
+.matrix-table tbody .tier-label { text-align: left; padding-left: 24px; font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--ink); }
+.matrix-cell { position: relative; }
+.matrix-cell.has-data { cursor: pointer; transition: background 0.15s ease; }
+.matrix-cell.has-data:hover { background: var(--bg-soft); }
+.matrix-cell .cell-count { display: block; font-family: var(--serif); font-size: 24px; font-weight: 500; color: var(--ink); line-height: 1.1; }
+.matrix-cell .cell-status { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; }
+.matrix-cell .cell-status.healthy { color: var(--green); } .matrix-cell .cell-status.watch { color: var(--amber); } .matrix-cell .cell-status.high { color: var(--red); }
+.status-dot-mat { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.status-dot-mat.healthy { background: var(--green); } .status-dot-mat.watch { background: var(--amber); } .status-dot-mat.high { background: var(--red); }
+.matrix-cell.no-tier { color: var(--ink-mute); font-size: 16px; }
+.matrix-row-total { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink-soft); background: var(--bg-soft); }
+.matrix-legend { padding: 12px 24px; border-top: 1px solid var(--line-soft); background: var(--bg-soft); display: flex; align-items: center; gap: 18px; font-family: var(--mono); font-size: 10px; color: var(--ink-soft); letter-spacing: 0.05em; }
+.matrix-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+
+/* v14 §B 등급별 랭킹 */
+.tier-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.tier-tab { background: var(--bg); border: 1px solid var(--line); font-family: var(--sans); font-size: 13px; padding: 8px 16px; cursor: pointer; color: var(--ink-soft); display: inline-flex; align-items: center; gap: 8px; font-weight: 500; transition: all 0.15s ease; }
+.tier-tab:hover:not(:disabled) { background: var(--bg-soft); border-color: var(--ink-soft); }
+.tier-tab.active { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 600; }
+.tier-tab:disabled { opacity: 0.4; cursor: not-allowed; }
+.tier-tab .count { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); font-weight: 500; }
+.tier-tab.active .count { color: rgba(255,255,255,0.7); }
+.rank-table { width: 100%; border-collapse: collapse; background: var(--bg); }
+.rank-table thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-mute); text-align: left; padding: 14px 12px; border-bottom: 1.5px solid var(--ink); font-weight: 600; }
+.rank-table thead th.num { text-align: right; }
+.rank-table tbody td { padding: 16px 12px; border-bottom: 1px solid var(--line-soft); color: var(--ink); }
+.rank-table tbody tr:hover td { background: var(--bg-soft); }
+.rank-num { width: 44px; text-align: center; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--bg); }
+.rank-num span { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: var(--ink); }
+.rank-num span.rk-2 { background: var(--ink-soft); } .rank-num span.rk-3 { background: var(--ink-mute); } .rank-num span.rk-rest { background: var(--bg-card); color: var(--ink-mute); }
+.rank-creator { font-family: var(--sans); font-size: 14px; font-weight: 600; color: var(--ink); }
+.rank-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-mute); }
+.rank-num-val { font-family: var(--mono); font-size: 13px; font-weight: 600; text-align: right; }
+.rank-num-val.pos { color: var(--green); } .rank-num-val.neg { color: var(--red); }
+.rank-status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; border: 1px solid; text-transform: uppercase; }
+.rank-status-pill.healthy { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.rank-status-pill.watch { color: var(--amber); border-color: var(--amber); background: var(--amber-bg); }
+.rank-status-pill.high { color: var(--red); border-color: var(--red); background: var(--red-bg); }
+.rank-status-pill.nodata { color: var(--ink-mute); border-color: var(--line); background: var(--bg-soft); }
+
+/* v14 모달 */
+.mat-modal { position: fixed; inset: 0; background: rgba(26,24,21,0.45); display: none; align-items: flex-start; justify-content: center; z-index: 9999; padding: 80px 20px 20px; overflow-y: auto; }
+.mat-modal.show { display: flex; }
+.mat-modal-inner { background: var(--bg); border: 1px solid var(--ink); width: 100%; max-width: 720px; padding: 32px 36px; }
+.mat-modal-head { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 18px; border-bottom: 1.5px solid var(--ink); margin-bottom: 22px; }
+.mat-modal-meta { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); font-weight: 500; margin-bottom: 6px; }
+.mat-modal-title { font-family: var(--serif); font-size: 22px; font-weight: 600; font-style: italic; letter-spacing: -0.02em; }
+.mat-modal-close { background: transparent; border: 1px solid var(--ink); font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; padding: 6px 12px; cursor: pointer; color: var(--ink); }
+.mat-modal-close:hover { background: var(--ink); color: var(--bg); }
+.mat-modal-row { display: grid; grid-template-columns: 1fr 100px 100px 90px; align-items: center; padding: 12px 4px; border-bottom: 1px solid var(--line-soft); gap: 12px; }
+.mat-modal-row:last-child { border-bottom: none; }
+.mat-modal-row .name { font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink); }
+.mat-modal-row .sub, .mat-modal-row .rev { font-family: var(--mono); font-size: 11px; text-align: right; color: var(--ink-soft); }
+.mat-modal-row .badge { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 7px; border: 1px solid; display: inline-block; text-align: center; }
+.mat-modal-row .badge.data { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.mat-modal-row .badge.wait { color: var(--ink-mute); border-color: var(--line); background: var(--bg-soft); }
 
 @media (max-width: 1024px) {
   .pentagon-row { grid-template-columns: repeat(2, 1fr); }
@@ -521,6 +235,8 @@ html, body {
   .bw-grid-split { grid-template-columns: 1fr; }
   .hero { grid-template-columns: 1fr; }
   .health-block { align-items: flex-start; }
+  .matrix-table { font-size: 11px; }
+  .matrix-table thead th, .matrix-table tbody td { padding: 14px 8px; }
 }
 </style>
 </head>
@@ -536,16 +252,26 @@ html, body {
 
 <header class="masthead">
   <div>
-    <div class="eyebrow">Creator Performance LAB · Vol. 13 · Realtime</div>
+    <div class="eyebrow">Creator Performance LAB · Vol. 14 · Realtime</div>
     <h1>Channel <em>Performance</em> Review</h1>
   </div>
   <div class="masthead-right">
     LEFERI ENT. INTERNAL · CONFIDENTIAL<br/>
-    구독자 흐름 · 트렌드 · 영상 랭킹 · 롱폼 vs 숏폼
+    전사 통합 · 등급 현황 · 등급별 랭킹 · 크리에이터 상세
   </div>
 </header>
 
-<div class="controls">
+<nav class="view-toggle">
+  <button class="vt-btn active" data-view="overview">
+    <span class="vt-icon">▦</span> 전사 통합 <span class="vt-sub">All Creators</span>
+  </button>
+  <button class="vt-btn" data-view="detail">
+    <span class="vt-icon">◉</span> 크리에이터 상세 <span class="vt-sub">Single Creator</span>
+  </button>
+  <span class="vt-meta">5개 레이블 · 49명 라인업 통합 뷰</span>
+</nav>
+
+<div id="detail-controls" class="controls" style="display:none;">
   <div class="ctrl-group">
     <span class="ctrl-label">Creator</span>
     <div class="ctrl-segment" id="creator-tabs"></div>
@@ -565,10 +291,15 @@ html, body {
   </div>
 </div>
 
-<main id="dash"></main>
+<main id="overview-view"></main>
+<main id="dash" style="display:none;"></main>
+
+<div id="mat-modal" class="mat-modal">
+  <div class="mat-modal-inner" id="mat-modal-inner"></div>
+</div>
 
 <footer class="foot">
-  <span>Creator Performance LAB · v13 (Phase A)</span>
+  <span>Creator Performance LAB · v14</span>
   <span id="footer-meta"></span>
 </footer>
 
@@ -585,13 +316,114 @@ const SHEET_URLS = {
 };
 
 // ==============================================
+// v14 · 티어 분류 (50:50 합성 스코어, B안 80/65/50)
+// ==============================================
+const TIER_BY_NAME = {
+  '레오제이': '★ 메가', '민스코': '★ 메가', '아랑': '★ 메가', '홀리': '★ 메가',
+  'MEJIWOO 미지우': '▲ 준메가', 'Heizle 헤이즐': '▲ 준메가', 'HEEJOO 희주': '▲ 준메가',
+  'YuRia 유리아': '▲ 준메가', 'DAISY 데이지': '▲ 준메가', 'Kim Crystal 김크리스탈': '▲ 준메가',
+  'Double Soup 김습습': '▲ 준메가', 'DAHSA KIM 다샤 킴': '▲ 준메가', 'INGHWA 잉화': '▲ 준메가',
+  'You need 윤이든': '▲ 준메가', 'GREEN 윤그린': '▲ 준메가', 'Mia 미아': '▲ 준메가',
+  'Minjeong Park': '▲ 준메가', 'Mincarong 민카롱': '▲ 준메가', 'Hiyena 하이예나': '▲ 준메가',
+  'KIMDAX 킴닥스': '▲ 준메가',
+  "Serim's life 샒의 삶": '● 미드', '기은세의 집': '● 미드', 'BITNAL YOUNG 빛날 영': '● 미드',
+  'CHAESO 채소': '● 미드', 'Bambigirl 밤비걸': '● 미드', 'MIHEE 미희': '● 미드',
+  'Bohyun 보현': '● 미드', 'Sobong official 소봉': '● 미드', 'SANGHUI 상희': '● 미드',
+  'DailyJenna 데일리제나': '● 미드', 'Coco Riley 코코라일리': '● 미드', 'Leesu Blooming 리수': '● 미드',
+  'Jerie 재리': '● 미드', 'ZIHYUNSEO 지현서': '● 미드', '몌 MYERRY': '● 미드',
+  'Queen Solmee 퀸 솔미': '● 미드',
+  'Eunjomy 은조미': '○ 스몰', 'Danse JIN 춤추는선진이': '○ 스몰', 'DALNIM 달님': '○ 스몰',
+  '털난새우': '○ 스몰', 'Huoney 훠니': '○ 스몰', 'SANGAH CHOI 최상아': '○ 스몰',
+  '유진AN': '○ 스몰', '김아야 ayaageem': '○ 스몰', 'WOO NA 우나': '○ 스몰',
+  'Onde 온드': '○ 스몰', 'DAIN 다인': '○ 스몰', '틴즈': '○ 스몰',
+  '조나단': '미상',
+};
+
+const SCORE_BY_NAME = {
+  '레오제이': 94.7, '민스코': 88.2, '아랑': 82.2, '홀리': 81.2,
+  'MEJIWOO 미지우': 79.9, 'Heizle 헤이즐': 79.1, 'HEEJOO 희주': 77.3,
+  'YuRia 유리아': 71.5, 'DAISY 데이지': 70.5, 'Kim Crystal 김크리스탈': 70.4,
+  'Double Soup 김습습': 69.2, 'DAHSA KIM 다샤 킴': 68.9, 'INGHWA 잉화': 68.5,
+  'You need 윤이든': 67.9, 'GREEN 윤그린': 67.7, 'Mia 미아': 66.6,
+  'Minjeong Park': 65.1,
+  'Mincarong 민카롱': 68.0, 'Hiyena 하이예나': 67.0, 'KIMDAX 킴닥스': 66.5,
+  "Serim's life 샒의 삶": 60.2, '기은세의 집': 60.1, 'BITNAL YOUNG 빛날 영': 59.4,
+  'CHAESO 채소': 58.3, 'Bambigirl 밤비걸': 56.7, 'MIHEE 미희': 56.7,
+  'Bohyun 보현': 56.3, 'Sobong official 소봉': 56.2, 'SANGHUI 상희': 55.9,
+  'DailyJenna 데일리제나': 55.0, 'Coco Riley 코코라일리': 54.7, 'Leesu Blooming 리수': 54.6,
+  'Jerie 재리': 51.5, 'ZIHYUNSEO 지현서': 50.4, '몌 MYERRY': 50.4,
+  'Queen Solmee 퀸 솔미': 55.0,
+  'Eunjomy 은조미': 49.8, 'Danse JIN 춤추는선진이': 49.2, 'DALNIM 달님': 49.0,
+  '털난새우': 49.0, 'Huoney 훠니': 46.6,
+  'SANGAH CHOI 최상아': 33.9, '유진AN': 31.9, '김아야 ayaageem': 28.3,
+  'WOO NA 우나': 26.9, 'Onde 온드': 26.5, 'DAIN 다인': 13.6, '틴즈': 4.5,
+  '조나단': 0,
+};
+
+const SUBS_BY_NAME = {
+  '레오제이': 140, '민스코': 73.0, 'Heizle 헤이즐': 64.8, 'DAISY 데이지': 49.0,
+  '홀리': 44.7, 'Minjeong Park': 34.6, 'Hiyena 하이예나': 42.2, 'Bambigirl 밤비걸': 42.8,
+  "Serim's life 샒의 삶": 41.2, 'Leesu Blooming 리수': 40.9, 'Coco Riley 코코라일리': 25.9,
+  'Queen Solmee 퀸 솔미': 23.9, 'Bohyun 보현': 21.4, 'Jerie 재리': 13.1,
+  'DALNIM 달님': 12.9, 'DailyJenna 데일리제나': 10.6, 'Huoney 훠니': 10.9,
+  'MEJIWOO 미지우': 240, 'HEEJOO 희주': 77.2, 'GREEN 윤그린': 33.5,
+  'DAHSA KIM 다샤 킴': 27.2, 'INGHWA 잉화': 21.2, 'CHAESO 채소': 17.9,
+  'MIHEE 미희': 15.1, 'BITNAL YOUNG 빛날 영': 13.9, '기은세의 집': 13.7,
+  'SANGHUI 상희': 13.4, '유진AN': 9.36, 'ZIHYUNSEO 지현서': 7.55,
+  '털난새우': 7.37, 'SANGAH CHOI 최상아': 4.65, 'WOO NA 우나': 4.08,
+  '조나단': 0,
+  'Double Soup 김습습': 67.0, '아랑': 50.0, 'Mincarong 민카롱': 43.6,
+  'KIMDAX 킴닥스': 41.9, 'Kim Crystal 김크리스탈': 38.6, 'Sobong official 소봉': 37.5,
+  'Mia 미아': 35.7, 'YuRia 유리아': 29.2, 'Eunjomy 은조미': 22.2,
+  'You need 윤이든': 21.7, 'Danse JIN 춤추는선진이': 14.2, '몌 MYERRY': 13.4,
+  '김아야 ayaageem': 6.31, 'Onde 온드': 4.97, 'DAIN 다인': 1.53,
+  '틴즈': 2.4,
+};
+
+const REVENUE_BY_NAME = {
+  '레오제이': 31.4, '민스코': 31.1, '홀리': 22.0, '아랑': 21.9,
+  'INGHWA 잉화': 9.38, 'YuRia 유리아': 9.09, 'Heizle 헤이즐': 8.74,
+  'You need 윤이든': 8.18, 'DAHSA KIM 다샤 킴': 6.73, 'HEEJOO 희주': 4.98,
+  'Kim Crystal 김크리스탈': 4.92, '기은세의 집': 4.90, 'BITNAL YOUNG 빛날 영': 4.26,
+  'GREEN 윤그린': 3.99, 'DAISY 데이지': 3.37, 'DailyJenna 데일리제나': 3.22,
+  'Mia 미아': 3.02, 'ZIHYUNSEO 지현서': 2.63, 'SANGHUI 상희': 2.56,
+  'Minjeong Park': 2.52, 'MIHEE 미희': 2.39, 'CHAESO 채소': 2.37,
+  '털난새우': 2.20, 'Double Soup 김습습': 1.69, 'Jerie 재리': 1.31,
+  'Bohyun 보현': 1.29, 'MEJIWOO 미지우': 1.24, '몌 MYERRY': 1.05,
+  'DALNIM 달님': 0.89, "Serim's life 샒의 삶": 0.85, 'Danse JIN 춤추는선진이': 0.79,
+  'Huoney 훠니': 0.79, 'Coco Riley 코코라일리': 0.74,
+  'Sobong official 소봉': 0.52, 'Bambigirl 밤비걸': 0.46, 'Eunjomy 은조미': 0.43,
+  'SANGAH CHOI 최상아': 0.40, 'Leesu Blooming 리수': 0.35,
+  'WOO NA 우나': 0.16, 'Onde 온드': 0.11, '김아야 ayaageem': 0.10,
+  '유진AN': 0.095, 'DAIN 다인': 0.09,
+};
+
+const ROSTER = {
+  'DAEAD': ['레오제이'],
+  'LBE': ['민스코', '홀리', 'Heizle 헤이즐', 'DAISY 데이지', 'Minjeong Park',
+    'Hiyena 하이예나', 'Bambigirl 밤비걸', "Serim's life 샒의 삶",
+    'Leesu Blooming 리수', 'Coco Riley 코코라일리', 'Queen Solmee 퀸 솔미',
+    'Bohyun 보현', 'Jerie 재리', 'DALNIM 달님', 'DailyJenna 데일리제나', 'Huoney 훠니'],
+  'Caape': ['아랑', 'Double Soup 김습습', 'Mincarong 민카롱', 'KIMDAX 킴닥스',
+    'Kim Crystal 김크리스탈', 'Sobong official 소봉', 'Mia 미아',
+    'YuRia 유리아', 'Eunjomy 은조미', 'You need 윤이든',
+    'Danse JIN 춤추는선진이', '몌 MYERRY', '김아야 ayaageem', 'Onde 온드', 'DAIN 다인'],
+  'Le.dinary': ['MEJIWOO 미지우', 'HEEJOO 희주', 'GREEN 윤그린', 'DAHSA KIM 다샤 킴',
+    'INGHWA 잉화', 'CHAESO 채소', 'MIHEE 미희', 'BITNAL YOUNG 빛날 영',
+    '기은세의 집', 'SANGHUI 상희', '유진AN', 'ZIHYUNSEO 지현서',
+    '털난새우', 'SANGAH CHOI 최상아', 'WOO NA 우나', '조나단'],
+  '더넥스트레이블': ['틴즈'],
+};
+const ALL_LABELS = ['DAEAD', 'LBE', 'Caape', 'Le.dinary', '더넥스트레이블'];
+const TIERS = ['★ 메가', '▲ 준메가', '● 미드', '○ 스몰'];
+
+// ==============================================
 // UTILITIES
 // ==============================================
 const fmt = {
   num: n => Math.round(n || 0).toLocaleString('ko-KR'),
   numK: n => {
-    n = n || 0;
-    const abs = Math.abs(n);
+    n = n || 0; const abs = Math.abs(n);
     if (abs >= 1e8) return (n/1e8).toFixed(2) + '억';
     if (abs >= 1e4) return Math.round(n/1e4) + '만';
     if (abs >= 1e3) return (n/1e3).toFixed(1) + 'K';
@@ -599,6 +431,16 @@ const fmt = {
   },
   pct: (n, d=2) => (n||0).toFixed(d) + '%',
   signed: n => (n>=0?'+':'') + Math.round(n||0).toLocaleString('ko-KR'),
+  subsMan: n => {
+    if (n >= 100) return (n/100).toFixed(1).replace(/\.0$/,'') + '백만';
+    if (n >= 1) return n.toFixed(1).replace(/\.0$/,'') + '만';
+    return (n * 10).toFixed(1).replace(/\.0$/,'') + '천';
+  },
+  rev: n => {
+    if (!n || n === 0) return '—';
+    if (n >= 1) return n.toFixed(1).replace(/\.0$/,'') + '억';
+    return Math.round(n * 100) + '백만';
+  },
 };
 
 const esc = (s) => {
@@ -654,8 +496,8 @@ function dateToWeekLabel(dateStr) {
   const dayOfMonth = d.getDate();
   if (dayOfMonth < firstMondayDate) {
     const prev = new Date(d.getFullYear(), d.getMonth(), 0);
-    const fmt = pd => pd.getFullYear() + '-' + String(pd.getMonth()+1).padStart(2,'0') + '-' + String(pd.getDate()).padStart(2,'0');
-    return dateToWeekLabel(fmt(prev));
+    const fmtFn = pd => pd.getFullYear() + '-' + String(pd.getMonth()+1).padStart(2,'0') + '-' + String(pd.getDate()).padStart(2,'0');
+    return dateToWeekLabel(fmtFn(prev));
   }
   const weekOfMonth = Math.floor((dayOfMonth - firstMondayDate) / 7) + 1;
   return month + '월 ' + weekOfMonth + '주';
@@ -664,17 +506,8 @@ function dateToWeekLabel(dateStr) {
 // ==============================================
 // DATA STATE
 // ==============================================
-let DATA = {
-  masters: [],
-  weekly: [],
-  videos: [],
-};
-
-let STATE = {
-  creatorIdx: 0,
-  period: 'all',
-};
-
+let DATA = { masters: [], weekly: [], videos: [] };
+let STATE = { view: 'overview', creatorIdx: 0, period: 'all', tierFilter: '★ 메가' };
 const charts = {};
 function destroyCharts() {
   Object.values(charts).forEach(c => { try { c.destroy(); } catch(e) {} });
@@ -689,8 +522,8 @@ async function fetchCSV(url, name) {
     const r = await fetch(url, { mode: 'cors', cache: 'no-cache' });
     if (!r.ok) throw new Error(`${name}: HTTP ${r.status}`);
     const text = await r.text();
-    if (!text || text.trim().length === 0) throw new Error(`${name}: 빈 응답 (시트 게시 확인 필요)`);
-    if (text.trim().startsWith('<')) throw new Error(`${name}: HTML 응답 받음 (시트가 게시되지 않았거나 권한 문제)`);
+    if (!text || text.trim().length === 0) throw new Error(`${name}: 빈 응답`);
+    if (text.trim().startsWith('<')) throw new Error(`${name}: HTML 응답 받음 (게시 권한 확인)`);
     return text;
   } catch (err) {
     console.error(`[Fetch failed: ${name}]`, err);
@@ -699,125 +532,69 @@ async function fetchCSV(url, name) {
 }
 
 async function loadData() {
-  console.log('[Loading] Starting fetch...');
   const [m, w, v] = await Promise.all([
     fetchCSV(SHEET_URLS.creators_master, 'creators_master'),
     fetchCSV(SHEET_URLS.weekly_metrics, 'weekly_metrics'),
     fetchCSV(SHEET_URLS.videos, 'videos'),
   ]);
-  
   DATA.masters = csvToObjects(m).filter(r => !r.active || r.active.toLowerCase() !== 'false');
   DATA.weekly = csvToObjects(w);
   DATA.videos = csvToObjects(v);
-  
   console.log('[Loaded]', { masters: DATA.masters.length, weekly: DATA.weekly.length, videos: DATA.videos.length });
-  if (DATA.masters.length > 0) console.log('[Sample master]', DATA.masters[0]);
-  if (DATA.weekly.length > 0) console.log('[Sample weekly]', DATA.weekly[0]);
-  if (DATA.videos.length > 0) console.log('[Sample video]', DATA.videos[0]);
 }
 
 // ==============================================
-// 데이터 가공
+// 데이터 가공 (기존 v13 그대로)
 // ==============================================
-function getCreator() {
-  return DATA.masters[STATE.creatorIdx];
-}
+function getCreator() { return DATA.masters[STATE.creatorIdx]; }
 
 function getCreatorWeekly(creator) {
-  const cid = creator.creator_id;
-  const channelId = creator.channel_id;
-  
-  // 1차: creator_id로 매칭
+  const cid = creator.creator_id; const channelId = creator.channel_id;
   let rows = DATA.weekly.filter(w => w.creator_id === cid);
-  
-  // 2차 폴백: creator_id 매칭 실패 시 channel_id로 시도
-  if (rows.length === 0 && channelId) {
-    rows = DATA.weekly.filter(w => w.channel_id === channelId);
-    if (rows.length > 0) {
-      console.warn(`[Fallback] creator_id "${cid}"로 매칭 실패. channel_id "${channelId}"로 ${rows.length}행 매칭됨. 시트의 creator_id 일관성을 확인하세요.`);
-    }
-  }
-  
-  // 같은 week_start 중복 시 합산 병합 (uploads류만 합산, 나머지는 마지막 값)
+  if (rows.length === 0 && channelId) rows = DATA.weekly.filter(w => w.channel_id === channelId);
   const byWeek = {};
   rows.forEach(w => {
     const key = w.week_start || w.week;
-    if (!byWeek[key]) {
-      byWeek[key] = { ...w };
-    } else {
-      // 중복 발견: 누적 컬럼만 합산, 스냅샷 컬럼은 마지막 값 유지
-      ['sub_gained','sub_lost','sub_net','views','views_long','views_short',
-       'watch_time_hr','comments','shares','likes',
-       'uploads_long','uploads_short','uploads_total'].forEach(k => {
+    if (!byWeek[key]) byWeek[key] = { ...w };
+    else {
+      ['sub_gained','sub_lost','sub_net','views','views_long','views_short','watch_time_hr','comments','shares','likes','uploads_long','uploads_short','uploads_total'].forEach(k => {
         byWeek[key][k] = (num(byWeek[key][k]) + num(w[k])).toString();
       });
-      console.warn(`[Duplicate] 중복 주차 ${key} 병합됨 (creator: ${cid})`);
     }
   });
-  
   return Object.values(byWeek)
     .sort((a, b) => (a.week_start || '').localeCompare(b.week_start || ''))
     .map(w => ({
-      week_start: w.week_start,
-      week_label: dateToWeekLabel(w.week_start),
-      subscribers: num(w.subscribers),
-      sub_gained: num(w.sub_gained),
-      sub_lost: num(w.sub_lost),
-      sub_net: num(w.sub_net),
-      views: num(w.views),
-      views_long: num(w.views_long),
-      views_short: num(w.views_short),
-      avg_view_pct: num(w.avg_view_pct),
-      watch_time_hr: num(w.watch_time_hr),
-      comments: num(w.comments),
-      shares: num(w.shares),
-      likes: num(w.likes),
-      uploads_long: num(w.uploads_long),
-      uploads_short: num(w.uploads_short),
+      week_start: w.week_start, week_label: dateToWeekLabel(w.week_start),
+      subscribers: num(w.subscribers), sub_gained: num(w.sub_gained), sub_lost: num(w.sub_lost), sub_net: num(w.sub_net),
+      views: num(w.views), views_long: num(w.views_long), views_short: num(w.views_short),
+      avg_view_pct: num(w.avg_view_pct), watch_time_hr: num(w.watch_time_hr),
+      comments: num(w.comments), shares: num(w.shares), likes: num(w.likes),
+      uploads_long: num(w.uploads_long), uploads_short: num(w.uploads_short),
       uploads_total: num(w.uploads_total) || (num(w.uploads_long) + num(w.uploads_short)),
-      engagement_rate: num(w.engagement_rate),
-      spv: num(w.spv),
-      returning_viewer_pct: num(w.returning_viewer_pct),
+      engagement_rate: num(w.engagement_rate), spv: num(w.spv), returning_viewer_pct: num(w.returning_viewer_pct),
     }));
 }
 
 function getCreatorVideos(creator) {
-  const cid = creator.creator_id;
-  const channelId = creator.channel_id;
-  
-  // 1차: creator_id로 매칭
+  const cid = creator.creator_id; const channelId = creator.channel_id;
   let rows = DATA.videos.filter(v => v.creator_id === cid && v.title);
-  
-  // 2차 폴백: channel_id로
-  if (rows.length === 0 && channelId) {
-    rows = DATA.videos.filter(v => v.channel_id === channelId && v.title);
-  }
-  
-  // video_id 중복 제거 (같은 video_id가 여러 번 들어있으면 첫 번째만)
+  if (rows.length === 0 && channelId) rows = DATA.videos.filter(v => v.channel_id === channelId && v.title);
   const seen = new Set();
   rows = rows.filter(v => {
     if (!v.video_id) return true;
     if (seen.has(v.video_id)) return false;
-    seen.add(v.video_id);
-    return true;
+    seen.add(v.video_id); return true;
   });
-  
-  return rows
-    .map(v => ({
-      video_id: v.video_id,
-      title: v.title,
-      published_at: v.published_at,
-      week_label: dateToWeekLabel(v.published_at),
-      duration_sec: num(v.duration_sec),
-      video_type: v.video_type || (num(v.duration_sec) >= 60 ? 'long' : 'short'),
-      views: num(v.views),
-      likes: num(v.likes),
-      comments: num(v.comments),
-      shares: num(v.shares),
-      h3_category: v['3h_category'] || '',
-      biz_org: v.biz_org || '',
-    }))
-    .sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''));
+  return rows.map(v => ({
+    video_id: v.video_id, title: v.title, published_at: v.published_at,
+    week_label: dateToWeekLabel(v.published_at),
+    duration_sec: num(v.duration_sec),
+    video_type: v.video_type || (num(v.duration_sec) >= 60 ? 'long' : 'short'),
+    views: num(v.views), likes: num(v.likes), comments: num(v.comments), shares: num(v.shares),
+    avg_view_pct: num(v.avg_view_pct),
+    h3_category: v['3h_category'] || '', biz_org: v.biz_org || '',
+  })).sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''));
 }
 
 function filterByPeriod(weekly) {
@@ -836,72 +613,44 @@ function filterVideosByPeriodWeeks(videos, periodWeeks) {
 }
 
 // ==============================================
-// 5축 점수 계산
+// 5축 점수 계산 (Phase A 포함)
 // ==============================================
 function computePentagon(creator, weekly) {
-  if (weekly.length === 0) {
-    return { scores: [0,0,0,0,0], overall: 0, grade: 'none', raw: {} };
-  }
-  
+  if (weekly.length === 0) return { scores: [0,0,0,0,0], overall: 0, grade: 'none', raw: {} };
   const subsBase = num(creator.subscribers_baseline);
-  
-  // ① 구독자 성장: sub_net 합 / 구독자 기반 × 100, 0.5%/기간 = 100점
   const totalNet = weekly.reduce((s, w) => s + w.sub_net, 0);
   const growthRate = subsBase > 0 ? (totalNet / subsBase) * 100 : 0;
   const growthScore = Math.max(0, Math.min(100, 50 + growthRate * 100));
-  
-  // ② 콘텐츠 공급: 주당 평균 + 공백 페널티 (주 3건 = 100점)
   const totalUploads = weekly.reduce((s, w) => s + w.uploads_total, 0);
   const avgPerWeek = totalUploads / weekly.length;
   const emptyWeeks = weekly.filter(w => w.uploads_total === 0).length;
   let supplyScore = Math.min(100, (avgPerWeek / 3) * 100);
   supplyScore = Math.max(0, supplyScore - emptyWeeks * 5);
-  
-  // ③ 콘텐츠 효율: avg_view_pct (40% = 100점)
   const validVP = weekly.filter(w => w.avg_view_pct > 0);
   const avgVP = validVP.length > 0 ? validVP.reduce((s, w) => s + w.avg_view_pct, 0) / validVP.length : 0;
   const effScore = Math.max(0, Math.min(100, (avgVP / 40) * 100));
-  
-  // ④ 인게이지먼트: engagement_rate (0.8% = 100점)
-  // ============ PHASE A 패치: likes 포함 ============
   const validER = weekly.filter(w => w.views > 0);
   const totalEng = validER.reduce((s, w) => s + w.likes + w.comments + w.shares, 0);
   const totalViews = validER.reduce((s, w) => s + w.views, 0);
   const engRate = totalViews > 0 ? (totalEng / totalViews) * 100 : 0;
   const engScore = Math.max(0, Math.min(100, (engRate / 0.8) * 100));
-  // ============================================
-  
-  // ⑤ 충성도: returning_viewer_pct (50% = 100점, 없으면 SPV 프록시)
   const validRV = weekly.filter(w => w.returning_viewer_pct > 0);
-  let loyaltyScore = 0;
-  let loyaltyRaw = '데이터 없음';
-  let loyaltyReal = false;
+  let loyaltyScore = 0; let loyaltyRaw = '데이터 없음'; let loyaltyReal = false;
   if (validRV.length > 0) {
     const avgRV = validRV.reduce((s, w) => s + w.returning_viewer_pct, 0) / validRV.length;
     loyaltyScore = Math.max(0, Math.min(100, (avgRV / 50) * 100));
-    loyaltyRaw = avgRV.toFixed(1) + '%';
-    loyaltyReal = true;
+    loyaltyRaw = avgRV.toFixed(1) + '%'; loyaltyReal = true;
   } else {
-    // SPV 프록시 (sub_net/views × 100, 0.1% = 60점)
     const spv = totalViews > 0 ? (totalNet / totalViews) * 100 : 0;
     loyaltyScore = Math.max(0, Math.min(60, (spv / 0.1) * 60));
     loyaltyRaw = `SPV ${spv.toFixed(3)}%`;
   }
-  
-  const scores = [
-    Math.round(growthScore),
-    Math.round(supplyScore),
-    Math.round(effScore),
-    Math.round(engScore),
-    Math.round(loyaltyScore),
-  ];
+  const scores = [Math.round(growthScore), Math.round(supplyScore), Math.round(effScore), Math.round(engScore), Math.round(loyaltyScore)];
   const overall = Math.round(scores.reduce((s,x) => s+x, 0) / 5);
-  
   let grade;
   if (overall >= 70) grade = 'healthy';
   else if (overall >= 50) grade = 'watch';
   else grade = 'high';
-  
   return {
     scores, overall, grade,
     raw: {
@@ -915,7 +664,275 @@ function computePentagon(creator, weekly) {
 }
 
 // ==============================================
-// RENDER: Creator Tabs
+// v14 신규: 전사 통합 - 멤버 결합 + 매트릭스
+// ==============================================
+function findMasterByName(name) {
+  return DATA.masters.find(m => {
+    const mname = m.name_ko || '';
+    return mname === name || mname.includes(name) || name.includes(mname);
+  });
+}
+
+function getAugmentedRoster() {
+  const out = [];
+  ALL_LABELS.forEach(label => {
+    (ROSTER[label] || []).forEach(name => {
+      const tier = TIER_BY_NAME[name] || '미상';
+      const master = findMasterByName(name);
+      let hasData = false; let healthGrade = null;
+      if (master) {
+        const weekly = getCreatorWeekly(master);
+        hasData = weekly.length > 0;
+        if (hasData) {
+          const pent = computePentagon(master, weekly);
+          healthGrade = pent.grade;
+        }
+      }
+      out.push({
+        name, label, tier, hasData, master, healthGrade,
+        score: SCORE_BY_NAME[name] || 0,
+        subs: SUBS_BY_NAME[name] || 0,
+        revenue: REVENUE_BY_NAME[name] || 0,
+      });
+    });
+  });
+  return out;
+}
+
+function computeMatrix() {
+  const roster = getAugmentedRoster();
+  const cells = {};
+  TIERS.forEach(t => {
+    cells[t] = {};
+    ALL_LABELS.forEach(l => { cells[t][l] = { count: 0, dataCount: 0, members: [], status: null }; });
+  });
+  roster.forEach(p => {
+    if (p.tier === '미상' || !cells[p.tier]) return;
+    const cell = cells[p.tier][p.label]; if (!cell) return;
+    cell.count++; cell.members.push(p);
+    if (p.hasData) cell.dataCount++;
+  });
+  Object.values(cells).forEach(rowCells => {
+    Object.values(rowCells).forEach(cell => {
+      if (cell.dataCount === 0) { cell.status = null; return; }
+      const grades = cell.members.filter(m => m.hasData).map(m => m.healthGrade);
+      if (grades.includes('high')) cell.status = 'high';
+      else if (grades.includes('watch')) cell.status = 'watch';
+      else cell.status = 'healthy';
+    });
+  });
+  return { cells, roster };
+}
+
+// ===== merged =====
+
+// ==============================================
+// v14: 전사 통합 뷰 렌더
+// ==============================================
+function renderOverview() {
+  destroyCharts();
+  const ovEl = document.getElementById('overview-view');
+  ovEl.innerHTML = renderMatrixSection() + renderTierRankingSection();
+  document.getElementById('footer-meta').textContent = '전사 통합 · 49명 라인업';
+}
+
+function renderMatrixSection() {
+  const { cells } = computeMatrix();
+  const labelHeaders = ALL_LABELS.map(l => `<th>${esc(l)}</th>`).join('');
+  const rows = TIERS.map(tier => {
+    let rowTotal = 0;
+    const tds = ALL_LABELS.map(label => {
+      const cell = cells[tier][label]; rowTotal += cell.count;
+      if (cell.count === 0) return `<td class="matrix-cell no-tier">—</td>`;
+      const statusHtml = cell.status
+        ? `<span class="cell-status ${cell.status}"><span class="status-dot-mat ${cell.status}"></span>${cell.status === 'healthy' ? '안전' : cell.status === 'watch' ? '주의' : '위험'}</span>`
+        : `<span class="cell-status" style="color:var(--ink-mute);font-size:9px;">데이터 ${cell.dataCount}/${cell.count}</span>`;
+      return `<td class="matrix-cell has-data" onclick="window._openMatModal('${esc(tier)}','${esc(label)}')">
+        <span class="cell-count">${cell.count}명</span>
+        ${statusHtml}
+      </td>`;
+    }).join('');
+    return `<tr>
+      <td class="tier-label">${esc(tier)}</td>
+      ${tds}
+      <td class="matrix-row-total">${rowTotal > 0 ? rowTotal + '명' : '—'}</td>
+    </tr>`;
+  }).join('');
+  const colTotals = ALL_LABELS.map(label => TIERS.reduce((s, t) => s + cells[t][label].count, 0));
+  const grandTotal = colTotals.reduce((s, n) => s + n, 0);
+  return `
+    <section class="section">
+      <div class="sec-head">
+        <span class="sec-num">§ A · MATRIX</span>
+        <span class="sec-title">크리에이터 <em>등급 현황</em></span>
+        <span class="sec-sub">셀 클릭 시 해당 그룹 크리에이터 목록</span>
+      </div>
+      <div class="matrix-wrap">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th class="row-head">TIER ↓ / LABEL →</th>
+              ${labelHeaders}
+              <th style="width:90px;">합계</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+            <tr>
+              <td class="tier-label" style="color:var(--ink-mute);font-size:12px;">합계</td>
+              ${colTotals.map(n => `<td class="matrix-row-total">${n > 0 ? n + '명' : '—'}</td>`).join('')}
+              <td class="matrix-row-total" style="font-weight:700;">${grandTotal}명</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="matrix-legend">
+          <span class="matrix-legend-item"><span class="status-dot-mat healthy"></span>안전</span>
+          <span class="matrix-legend-item"><span class="status-dot-mat watch"></span>주의</span>
+          <span class="matrix-legend-item"><span class="status-dot-mat high"></span>위험</span>
+          <span style="margin-left:auto;">※ 활성 데이터가 있는 셀만 상태점 표시 · 분류 기준: 2025 매출 + 구독자 합성 스코어 (50:50)</span>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderTierRankingSection() {
+  const { cells } = computeMatrix();
+  const tierCounts = {};
+  TIERS.forEach(t => { tierCounts[t] = ALL_LABELS.reduce((s, l) => s + cells[t][l].count, 0); });
+  const tier = STATE.tierFilter;
+  const members = [];
+  ALL_LABELS.forEach(l => { cells[tier][l].members.forEach(m => members.push(m)); });
+  members.forEach(m => {
+    if (m.hasData) {
+      const weekly = getCreatorWeekly(m.master);
+      m._subDelta = weekly.reduce((s, w) => s + w.sub_net, 0);
+      const validVP = weekly.filter(w => w.avg_view_pct > 0);
+      m._avgVP = validVP.length > 0 ? validVP.reduce((s, w) => s + w.avg_view_pct, 0) / validVP.length : 0;
+    } else { m._subDelta = null; m._avgVP = null; }
+  });
+  members.sort((a, b) => {
+    if (a.hasData && !b.hasData) return -1;
+    if (!a.hasData && b.hasData) return 1;
+    if (a.hasData && b.hasData) return b._subDelta - a._subDelta;
+    return b.score - a.score;
+  });
+  const rows = members.map((m, i) => {
+    const rankClass = i === 0 ? '' : i === 1 ? 'rk-2' : i === 2 ? 'rk-3' : 'rk-rest';
+    const subsCell = m.subs > 0 ? fmt.subsMan(m.subs) : '—';
+    let deltaCell = '<span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">데이터 대기</span>';
+    let vpCell = '<span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">—</span>';
+    let statusCell = '<span class="rank-status-pill nodata">대기</span>';
+    if (m.hasData) {
+      const sign = m._subDelta >= 0 ? '+' : '';
+      const cls = m._subDelta >= 0 ? 'pos' : 'neg';
+      deltaCell = `<span class="rank-num-val ${cls}">${sign}${fmt.num(m._subDelta)}</span>`;
+      vpCell = `<span class="rank-num-val">${m._avgVP.toFixed(1)}%</span>`;
+      const label = m.healthGrade === 'healthy' ? '안전' : m.healthGrade === 'watch' ? '주의' : '위험';
+      statusCell = `<span class="rank-status-pill ${m.healthGrade}">${label}</span>`;
+    }
+    return `<tr>
+      <td class="rank-num"><span class="${rankClass}">${i+1}</span></td>
+      <td class="rank-creator">${esc(m.name)}</td>
+      <td class="rank-label">${esc(m.label)}</td>
+      <td class="rank-num-val" style="color:var(--ink-soft);">${subsCell}</td>
+      <td>${deltaCell}</td>
+      <td>${vpCell}</td>
+      <td>${statusCell}</td>
+    </tr>`;
+  }).join('');
+  const tabsHtml = TIERS.map(t => {
+    const active = STATE.tierFilter === t ? 'active' : '';
+    const dis = tierCounts[t] === 0 ? 'disabled' : '';
+    return `<button class="tier-tab ${active}" ${dis} onclick="window._setTier('${esc(t)}')">${esc(t)} <span class="count">${tierCounts[t]}명</span></button>`;
+  }).join('');
+  return `
+    <section class="section">
+      <div class="sec-head">
+        <span class="sec-num">§ B · TIER RANKING</span>
+        <span class="sec-title">등급별 <em>랭킹</em></span>
+        <span class="sec-sub">동일 체급끼리 비교 · 기간 구독순증 기준</span>
+      </div>
+      <div class="tier-tabs">${tabsHtml}</div>
+      ${members.length === 0 ? `<div class="empty">${esc(tier)} 등급에 해당하는 크리에이터가 없습니다.</div>` : `
+      <div style="border:1px solid var(--line);">
+        <table class="rank-table">
+          <thead>
+            <tr>
+              <th style="width:44px;">#</th>
+              <th>크리에이터</th>
+              <th style="width:120px;">레이블</th>
+              <th class="num" style="width:90px;">구독자</th>
+              <th class="num" style="width:110px;">기간 순증</th>
+              <th class="num" style="width:100px;">평균 조회율</th>
+              <th style="width:80px;">상태</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`}
+    </section>
+  `;
+}
+
+window._openMatModal = (tier, label) => {
+  const { cells } = computeMatrix();
+  const cell = cells[tier]?.[label];
+  if (!cell || cell.count === 0) return;
+  const sortedMembers = [...cell.members].sort((a, b) => b.score - a.score);
+  const html = `
+    <div class="mat-modal-head">
+      <div>
+        <div class="mat-modal-meta">${esc(label)} · ${esc(tier)}</div>
+        <div class="mat-modal-title">${cell.count}명 크리에이터</div>
+      </div>
+      <button class="mat-modal-close" onclick="window._closeMatModal()">CLOSE ✕</button>
+    </div>
+    <div>
+      ${sortedMembers.map(m => `
+        <div class="mat-modal-row">
+          <div>
+            <div class="name">${esc(m.name)}</div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);margin-top:2px;">스코어 ${m.score.toFixed(1)}</div>
+          </div>
+          <div class="sub">${m.subs > 0 ? fmt.subsMan(m.subs) : '—'}</div>
+          <div class="rev">${fmt.rev(m.revenue)}</div>
+          <div><span class="badge ${m.hasData ? 'data' : 'wait'}">${m.hasData ? 'DATA' : '대기'}</span></div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;color:var(--ink-mute);display:flex;justify-content:space-between;">
+      <span>좌→우: 이름·스코어 · 구독자 · 2025 매출 · 데이터 상태</span>
+      <span>스코어 내림차순</span>
+    </div>
+  `;
+  document.getElementById('mat-modal-inner').innerHTML = html;
+  document.getElementById('mat-modal').classList.add('show');
+};
+
+window._closeMatModal = () => { document.getElementById('mat-modal').classList.remove('show'); };
+window._setTier = (t) => { STATE.tierFilter = t; renderOverview(); };
+
+// ==============================================
+// 뷰 전환
+// ==============================================
+function setView(view) {
+  STATE.view = view;
+  document.querySelectorAll('.vt-btn').forEach(b => { b.classList.toggle('active', b.dataset.view === view); });
+  if (view === 'overview') {
+    document.getElementById('overview-view').style.display = '';
+    document.getElementById('dash').style.display = 'none';
+    document.getElementById('detail-controls').style.display = 'none';
+    renderOverview();
+  } else {
+    document.getElementById('overview-view').style.display = 'none';
+    document.getElementById('dash').style.display = '';
+    document.getElementById('detail-controls').style.display = '';
+    renderDash();
+  }
+}
+
+// ==============================================
+// Creator Tabs
 // ==============================================
 function renderCreatorTabs() {
   const wrap = document.getElementById('creator-tabs');
@@ -923,108 +940,32 @@ function renderCreatorTabs() {
     wrap.innerHTML = '<span style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);padding:6px 12px;">데이터 없음</span>';
     return;
   }
-  wrap.innerHTML = DATA.masters.map((c, i) => `
-    <button data-idx="${i}" class="${i === STATE.creatorIdx ? 'active' : ''}">
-      ${esc(c.name_ko || c.creator_id)}
-    </button>
-  `).join('');
+  wrap.innerHTML = DATA.masters.map((c, i) => `<button data-idx="${i}" class="${i === STATE.creatorIdx ? 'active' : ''}">${esc(c.name_ko || c.creator_id)}</button>`).join('');
   wrap.querySelectorAll('button').forEach(btn => {
-    btn.onclick = () => {
-      STATE.creatorIdx = parseInt(btn.dataset.idx);
-      renderCreatorTabs();
-      renderDash();
-    };
+    btn.onclick = () => { STATE.creatorIdx = parseInt(btn.dataset.idx); renderCreatorTabs(); renderDash(); };
   });
 }
 
 // ==============================================
-// RENDER: Main Dashboard
+// 크리에이터 상세 뷰 (v13 그대로)
 // ==============================================
 function renderDash() {
   destroyCharts();
-  
   const creator = getCreator();
   const dash = document.getElementById('dash');
-  
-  if (!creator) {
-    dash.innerHTML = `<div class="section"><div class="empty">크리에이터 데이터가 없습니다.</div></div>`;
-    return;
-  }
-  
+  if (!creator) { dash.innerHTML = `<div class="section"><div class="empty">크리에이터 데이터가 없습니다.</div></div>`; return; }
   const allWeekly = getCreatorWeekly(creator);
   const weekly = filterByPeriod(allWeekly);
   const allVideos = getCreatorVideos(creator);
   const videos = filterVideosByPeriodWeeks(allVideos, weekly);
-  
   if (weekly.length === 0) {
-    // 진단 정보 - 시트에 뭐가 들어있는지 보여주기
-    const allCidsInWeekly = [...new Set(DATA.weekly.map(w => w.creator_id))].filter(Boolean);
-    const allCidsInVideos = [...new Set(DATA.videos.map(v => v.creator_id))].filter(Boolean);
-    const weeklyHeaders = DATA.weekly.length > 0 ? Object.keys(DATA.weekly[0]) : [];
-    const sampleWeekly = DATA.weekly.length > 0 ? DATA.weekly[0] : null;
-    
-    dash.innerHTML = `
-      <div class="section">
-        <div class="sec-head">
-          <span class="sec-num">DIAGNOSTIC</span>
-          <span class="sec-title">데이터 <em>매칭 실패</em></span>
-        </div>
-        <div class="empty" style="text-align:left;padding:32px;">
-          <div style="font-family:var(--mono);font-size:13px;color:var(--ink);margin-bottom:20px;">
-            <strong>${esc(creator.name_ko)}</strong> (creator_id: <code style="background:var(--bg-card);padding:2px 6px;color:var(--accent);">${esc(creator.creator_id || '(빈 값)')}</code>) 와 일치하는 weekly_metrics 행이 없습니다.
-          </div>
-          
-          <div style="background:var(--bg-card);padding:16px 20px;margin-bottom:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink);">
-            <strong style="color:var(--accent);">📋 creators_master에 있는 creator_id 목록:</strong><br/>
-            ${DATA.masters.map(m => `<code style="background:var(--bg);padding:2px 6px;margin:2px;">${esc(m.creator_id || '(빈 값)')}</code> → ${esc(m.name_ko)}`).join('<br/>')}
-          </div>
-          
-          <div style="background:var(--bg-card);padding:16px 20px;margin-bottom:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink);">
-            <strong style="color:var(--accent);">📋 weekly_metrics 시트의 creator_id 목록 (${DATA.weekly.length}행):</strong><br/>
-            ${allCidsInWeekly.length > 0 
-              ? allCidsInWeekly.map(c => `<code style="background:var(--bg);padding:2px 6px;margin:2px;">${esc(c)}</code>`).join(' ')
-              : '<span style="color:var(--red);">creator_id 컬럼에 값이 없음</span>'}
-          </div>
-          
-          <div style="background:var(--bg-card);padding:16px 20px;margin-bottom:16px;font-family:var(--mono);font-size:12px;line-height:1.8;color:var(--ink);">
-            <strong style="color:var(--accent);">📋 weekly_metrics 컬럼 (${weeklyHeaders.length}개):</strong><br/>
-            ${weeklyHeaders.map(h => `<code style="background:var(--bg);padding:2px 6px;margin:2px;">${esc(h)}</code>`).join(' ')}
-          </div>
-          
-          ${sampleWeekly ? `
-          <div style="background:var(--bg-card);padding:16px 20px;font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink);">
-            <strong style="color:var(--accent);">📋 weekly_metrics 첫 행 샘플:</strong><br/>
-            <pre style="margin-top:8px;white-space:pre-wrap;word-break:break-all;">${esc(JSON.stringify(sampleWeekly, null, 2))}</pre>
-          </div>
-          ` : ''}
-          
-          <div style="margin-top:20px;padding:14px 18px;background:var(--amber-bg);border-left:3px solid var(--amber);font-family:var(--sans);font-size:13px;line-height:1.6;color:#78350f;">
-            <strong>해결 방법:</strong><br/>
-            1. creators_master의 creator_id와 weekly_metrics의 creator_id가 <strong>정확히 같은지</strong> 확인 (대소문자, 공백 포함)<br/>
-            2. updateAll() 함수를 다시 실행해서 weekly_metrics 시트가 비어있지 않은지 확인<br/>
-            3. weekly_metrics 시트의 첫 행이 헤더(컬럼명)인지 확인
-          </div>
-        </div>
-      </div>`;
+    dash.innerHTML = `<div class="section"><div class="sec-head"><span class="sec-num">DIAGNOSTIC</span><span class="sec-title">데이터 <em>매칭 실패</em></span></div><div class="empty">${esc(creator.name_ko)}와 일치하는 weekly_metrics 행이 없습니다.<br/>creator_id 일관성을 확인해주세요.</div></div>`;
     return;
   }
-  
   const pent = computePentagon(creator, weekly);
-  
-  // 헤더 + 5축
-  const periodLabel = {
-    all: '전체 기간',
-    last4: '최근 4주',
-    last8: '최근 8주',
-    last12: '최근 12주',
-  }[STATE.period];
-  
-  const periodRange = weekly.length > 0
-    ? `${weekly[0].week_label} ~ ${weekly[weekly.length-1].week_label}`
-    : '';
-  
+  const periodLabel = { all: '전체 기간', last4: '최근 4주', last8: '최근 8주', last12: '최근 12주' }[STATE.period];
+  const periodRange = weekly.length > 0 ? `${weekly[0].week_label} ~ ${weekly[weekly.length-1].week_label}` : '';
   document.getElementById('footer-meta').textContent = `${periodLabel} · ${weekly.length}주 · ${videos.length}개 영상`;
-  
   dash.innerHTML = `
     ${renderHero(creator, weekly, pent)}
     ${renderPentagon(pent)}
@@ -1034,54 +975,19 @@ function renderDash() {
     ${renderFormatSplit(weekly, videos)}
     ${renderVideoRanking(videos, periodLabel)}
   `;
-  
   setTimeout(() => {
-    buildSubChart(weekly);
-    buildFlowChart(weekly);
-    buildViewsChart(weekly);
-    buildUploadsChart(weekly);
-    buildVPChart(weekly, videos);
-    buildEngagementChart(weekly, videos);
-    buildFormatViewsChart(weekly);
-    buildFormatUploadsChart(weekly);
+    buildSubChart(weekly); buildFlowChart(weekly); buildViewsChart(weekly); buildUploadsChart(weekly);
+    buildVPChart(weekly, videos); buildEngagementChart(weekly, videos);
+    buildFormatViewsChart(weekly); buildFormatUploadsChart(weekly);
   }, 50);
 }
 
-// ==============================================
-// SECTIONS
-// ==============================================
 function renderHero(creator, weekly, pent) {
   const latest = weekly[weekly.length - 1];
   const subs = latest ? latest.subscribers : num(creator.subscribers_baseline);
   const totalNet = weekly.reduce((s, w) => s + w.sub_net, 0);
-  
   const gradeLabel = { healthy: 'HEALTHY', watch: 'WATCH', high: 'HIGH RISK' }[pent.grade] || '—';
-  
-  return `
-    <section class="hero">
-      <div>
-        <div class="hero-id">
-          <span class="hero-label-pill">${esc(creator.label || '—')}</span>
-          <span class="hero-name">${esc(creator.name_ko)}</span>
-          <span class="hero-handle">${esc(creator.channel_handle || '')}</span>
-        </div>
-        <div class="hero-stats">
-          <span>구독자<span class="stat-val">${fmt.numK(subs)}</span></span>
-          <span>기간 순증<span class="stat-val">${fmt.signed(totalNet)}</span></span>
-          <span>분석 기간<span class="stat-val">${weekly.length}주</span></span>
-        </div>
-      </div>
-      <div class="health-block">
-        <div class="health-eyebrow">Channel Health Score</div>
-        <div class="health-grade-row">
-          <div class="health-score">${pent.overall}<span class="max">/100</span></div>
-          <div class="health-badge ${pent.grade}">
-            <span class="bdot"></span>${gradeLabel}
-          </div>
-        </div>
-      </div>
-    </section>
-  `;
+  return `<section class="hero"><div><div class="hero-id"><span class="hero-label-pill">${esc(creator.label || '—')}</span><span class="hero-name">${esc(creator.name_ko)}</span><span class="hero-handle">${esc(creator.channel_handle || '')}</span></div><div class="hero-stats"><span>구독자<span class="stat-val">${fmt.numK(subs)}</span></span><span>기간 순증<span class="stat-val">${fmt.signed(totalNet)}</span></span><span>분석 기간<span class="stat-val">${weekly.length}주</span></span></div></div><div class="health-block"><div class="health-eyebrow">Channel Health Score</div><div class="health-grade-row"><div class="health-score">${pent.overall}<span class="max">/100</span></div><div class="health-badge ${pent.grade}"><span class="bdot"></span>${gradeLabel}</div></div></div></section>`;
 }
 
 function renderPentagon(pent) {
@@ -1093,118 +999,34 @@ function renderPentagon(pent) {
     `${pent.raw.engagement.rate.toFixed(2)}% · ${fmt.numK(pent.raw.engagement.total)}건`,
     pent.raw.loyalty.real ? `재방문 ${pent.raw.loyalty.raw}` : `프록시 · ${pent.raw.loyalty.raw}`,
   ];
-  
-  return `
-    <section class="pentagon-row">
-      ${pent.scores.map((s, i) => {
-        const cls = s >= 70 ? 'good' : s >= 50 ? 'mid' : 'low';
-        return `
-          <div class="pent-cell">
-            <div class="pent-name">${labels[i]}</div>
-            <div class="pent-score ${cls}">${s}<span style="font-size:14px;color:var(--ink-mute);font-family:var(--mono);font-weight:400;"> / 100</span></div>
-            <div class="pent-bar"><div class="pent-bar-fill ${cls}" style="width:${s}%"></div></div>
-            <div class="pent-sub">${subs[i]}</div>
-          </div>
-        `;
-      }).join('')}
-    </section>
-  `;
+  return `<section class="pentagon-row">${pent.scores.map((s, i) => {
+    const cls = s >= 70 ? 'good' : s >= 50 ? 'mid' : 'low';
+    return `<div class="pent-cell"><div class="pent-name">${labels[i]}</div><div class="pent-score ${cls}">${s}<span style="font-size:14px;color:var(--ink-mute);font-family:var(--mono);font-weight:400;"> / 100</span></div><div class="pent-bar"><div class="pent-bar-fill ${cls}" style="width:${s}%"></div></div><div class="pent-sub">${subs[i]}</div></div>`;
+  }).join('')}</section>`;
 }
 
 function renderDiagnosis(pent, creator) {
   const labels = ['구독 성장', '콘텐츠 공급', '콘텐츠 효율', '인게이지먼트', '충성도'];
   const indexed = pent.scores.map((s, i) => ({ s, name: labels[i] }));
   const sorted = [...indexed].sort((a, b) => a.s - b.s);
-  const weakest = sorted.slice(0, 2);
-  const strongest = sorted.slice(-2).reverse();
-  
+  const weakest = sorted.slice(0, 2); const strongest = sorted.slice(-2).reverse();
   let text = '';
-  if (pent.overall >= 70) {
-    text = `<strong>${strongest[0].name}(${strongest[0].s})</strong>·<strong>${strongest[1].name}(${strongest[1].s})</strong> 강점. <strong>${weakest[0].name}(${weakest[0].s})</strong> 보강 시 더 안정.`;
-  } else if (pent.overall >= 50) {
-    text = `<strong>${weakest[0].name}(${weakest[0].s})</strong>·<strong>${weakest[1].name}(${weakest[1].s})</strong> 점검 필요. 단기 개입 권장.`;
-  } else {
-    text = `<strong>${weakest[0].name}(${weakest[0].s})</strong> 영역 즉시 개입 필요. 종합 ${pent.overall}점 — 채널 체력 약화 단계.`;
-  }
-  
+  if (pent.overall >= 70) text = `<strong>${strongest[0].name}(${strongest[0].s})</strong>·<strong>${strongest[1].name}(${strongest[1].s})</strong> 강점. <strong>${weakest[0].name}(${weakest[0].s})</strong> 보강 시 더 안정.`;
+  else if (pent.overall >= 50) text = `<strong>${weakest[0].name}(${weakest[0].s})</strong>·<strong>${weakest[1].name}(${weakest[1].s})</strong> 점검 필요. 단기 개입 권장.`;
+  else text = `<strong>${weakest[0].name}(${weakest[0].s})</strong> 영역 즉시 개입 필요. 종합 ${pent.overall}점 — 채널 체력 약화 단계.`;
   const tag = { healthy: '진단 · HEALTHY', watch: '진단 · WATCH', high: '진단 · HIGH RISK' }[pent.grade];
-  
-  return `
-    <section style="padding: 0 48px 36px;">
-      <div class="diagnosis ${pent.grade}">
-        <span class="diag-tag">${tag}</span>${text}
-      </div>
-    </section>
-  `;
+  return `<section style="padding: 0 48px 36px;"><div class="diagnosis ${pent.grade}"><span class="diag-tag">${tag}</span>${text}</div></section>`;
 }
 
-// ============ § 01 구독자 흐름 ============
 function renderSubscriberFlow(weekly, periodLabel, periodRange) {
   const gained = weekly.reduce((s, w) => s + w.sub_gained, 0);
   const lost = weekly.reduce((s, w) => s + w.sub_lost, 0);
   const net = weekly.reduce((s, w) => s + w.sub_net, 0);
   const retainRate = gained > 0 ? ((gained - lost) / gained * 100) : 0;
-  
-  // gained가 0인 경우 안내
   const hasFlowData = gained > 0 || lost > 0;
-  
-  return `
-    <section class="section">
-      <div class="sec-head">
-        <span class="sec-num">§ 01</span>
-        <span class="sec-title">구독자 <em>흐름</em></span>
-        <span class="sec-sub">${periodLabel} · ${periodRange}</span>
-      </div>
-      
-      ${!hasFlowData ? `
-        <div class="warn-banner">
-          ⓘ sub_gained / sub_lost 값이 0입니다. YouTube Analytics API의 subscribersGained/subscribersLost 응답을 확인해주세요. sub_net만 표시됩니다.
-        </div>
-      ` : ''}
-      
-      <div class="flow-grid">
-        <div class="flow-cell gained">
-          <div class="flow-name">신규 구독 (Gained)</div>
-          <div class="flow-val pos">+${fmt.num(gained)}</div>
-          <div class="flow-sub">주당 평균 +${fmt.num(gained/weekly.length)}명</div>
-        </div>
-        <div class="flow-cell lost">
-          <div class="flow-name">이탈 구독 (Lost)</div>
-          <div class="flow-val neg">−${fmt.num(lost)}</div>
-          <div class="flow-sub">주당 평균 −${fmt.num(lost/weekly.length)}명</div>
-        </div>
-        <div class="flow-cell net">
-          <div class="flow-name">순증 (Net)</div>
-          <div class="flow-val ${net >= 0 ? 'pos' : 'neg'}">${fmt.signed(net)}</div>
-          <div class="flow-sub">${hasFlowData ? `유지율 ${retainRate.toFixed(1)}% · ` : ''}주당 평균 ${fmt.signed(net/weekly.length)}명</div>
-        </div>
-      </div>
-      
-      <div class="chart-grid-2">
-        <div class="chart-card">
-          <div class="chart-title">주차별 순증 추이</div>
-          <div class="chart-sub">막대 · 4주 이동평균 라인</div>
-          <div class="chart-legend">
-            <span><span class="lg-dot" style="background:var(--blue);"></span>주간 순증</span>
-            <span><span class="lg-dot" style="background:var(--orange);"></span>4주 이동평균</span>
-          </div>
-          <div class="chart-canvas tall"><canvas id="ch-sub"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">신규 vs 이탈 흐름</div>
-          <div class="chart-sub">${hasFlowData ? '신규(양수) · 이탈(음수)' : 'gained/lost 데이터 부족 시 sub_net만 표시'}</div>
-          <div class="chart-legend">
-            <span><span class="lg-dot" style="background:var(--green);"></span>신규</span>
-            <span><span class="lg-dot" style="background:var(--red);"></span>이탈</span>
-          </div>
-          <div class="chart-canvas tall"><canvas id="ch-flow"></canvas></div>
-        </div>
-      </div>
-    </section>
-  `;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 01</span><span class="sec-title">구독자 <em>흐름</em></span><span class="sec-sub">${periodLabel} · ${periodRange}</span></div>${!hasFlowData ? `<div class="warn-banner">ⓘ sub_gained / sub_lost 값이 0입니다. sub_net만 표시됩니다.</div>` : ''}<div class="flow-grid"><div class="flow-cell gained"><div class="flow-name">신규 구독 (Gained)</div><div class="flow-val pos">+${fmt.num(gained)}</div><div class="flow-sub">주당 평균 +${fmt.num(gained/weekly.length)}명</div></div><div class="flow-cell lost"><div class="flow-name">이탈 구독 (Lost)</div><div class="flow-val neg">−${fmt.num(lost)}</div><div class="flow-sub">주당 평균 −${fmt.num(lost/weekly.length)}명</div></div><div class="flow-cell net"><div class="flow-name">순증 (Net)</div><div class="flow-val ${net >= 0 ? 'pos' : 'neg'}">${fmt.signed(net)}</div><div class="flow-sub">${hasFlowData ? `유지율 ${retainRate.toFixed(1)}% · ` : ''}주당 평균 ${fmt.signed(net/weekly.length)}명</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 순증 추이</div><div class="chart-sub">막대 · 4주 이동평균 라인</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--blue);"></span>주간 순증</span><span><span class="lg-dot" style="background:var(--orange);"></span>4주 이동평균</span></div><div class="chart-canvas tall"><canvas id="ch-sub"></canvas></div></div><div class="chart-card"><div class="chart-title">신규 vs 이탈 흐름</div><div class="chart-sub">${hasFlowData ? '신규(양수) · 이탈(음수)' : 'sub_net만 표시'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--green);"></span>신규</span><span><span class="lg-dot" style="background:var(--red);"></span>이탈</span></div><div class="chart-canvas tall"><canvas id="ch-flow"></canvas></div></div></div></section>`;
 }
 
-// ============ § 02 주차별 트렌드 ============
 function renderWeeklyTrends(weekly, periodLabel, videos) {
   const totalViews = weekly.reduce((s, w) => s + w.views, 0);
   const totalWatch = weekly.reduce((s, w) => s + w.watch_time_hr, 0);
@@ -1212,275 +1034,48 @@ function renderWeeklyTrends(weekly, periodLabel, videos) {
   const totalLikes = weekly.reduce((s, w) => s + w.likes, 0);
   const totalShares = weekly.reduce((s, w) => s + w.shares, 0);
   const totalEng = totalComments + totalLikes + totalShares;
-  
-  return `
-    <section class="section">
-      <div class="sec-head">
-        <span class="sec-num">§ 02</span>
-        <span class="sec-title">주차별 <em>트렌드</em></span>
-        <span class="sec-sub">${periodLabel}</span>
-      </div>
-      
-      <div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="subkpi">
-          <div class="subkpi-name">총 조회수</div>
-          <div class="subkpi-val">${fmt.numK(totalViews)}</div>
-          <div class="subkpi-sub">주당 ${fmt.numK(totalViews/weekly.length)}</div>
-        </div>
-        <div class="subkpi">
-          <div class="subkpi-name">시청 시간</div>
-          <div class="subkpi-val">${fmt.numK(totalWatch)}<span class="unit">시간</span></div>
-          <div class="subkpi-sub">주당 ${fmt.numK(totalWatch/weekly.length)}h</div>
-        </div>
-        <div class="subkpi">
-          <div class="subkpi-name">총 인게이지먼트</div>
-          <div class="subkpi-val">${fmt.numK(totalEng)}</div>
-          <div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div>
-        </div>
-      </div>
-      
-      <div class="chart-grid-2">
-        <div class="chart-card">
-          <div class="chart-title">주차별 조회수 추이</div>
-          <div class="chart-sub">롱폼 · 숏폼 흐름 비교</div>
-          <div class="chart-legend">
-            <span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span>
-            <span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span>
-          </div>
-          <div class="chart-canvas tall"><canvas id="ch-views"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">주차별 업로드 건수</div>
-          <div class="chart-sub">롱폼 · 숏폼 발행 패턴</div>
-          <div class="chart-legend">
-            <span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span>
-            <span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span>
-          </div>
-          <div class="chart-canvas tall"><canvas id="ch-uploads"></canvas></div>
-        </div>
-      </div>
-      
-      <div class="chart-grid-2" style="margin-top:18px;">
-        <div class="chart-card">
-          <div class="chart-title">평균 시청 비율 추이</div>
-          <div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div>
-          <div class="chart-legend">
-            <span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span>
-            <span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span>
-            <span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span>
-          </div>
-          <div class="chart-canvas"><canvas id="ch-vp"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
-            <div class="chart-title">시청자 반응 추이</div>
-            <div class="ctrl-segment" id="eng-filter" style="font-size:9px;">
-              <button data-eng="all" class="active">전체</button>
-              <button data-eng="long">롱폼</button>
-              <button data-eng="short">숏폼</button>
-            </div>
-          </div>
-          <div class="chart-sub">좋아요 · 댓글 · 공유 (절대값)</div>
-          <div class="chart-legend">
-            <span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span>
-            <span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span>
-            <span><span class="lg-dot" style="background:var(--teal);"></span>공유</span>
-          </div>
-          <div class="chart-canvas"><canvas id="ch-eng"></canvas></div>
-        </div>
-      </div>
-    </section>
-  `;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 02</span><span class="sec-title">주차별 <em>트렌드</em></span><span class="sec-sub">${periodLabel}</span></div><div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);"><div class="subkpi"><div class="subkpi-name">총 조회수</div><div class="subkpi-val">${fmt.numK(totalViews)}</div><div class="subkpi-sub">주당 ${fmt.numK(totalViews/weekly.length)}</div></div><div class="subkpi"><div class="subkpi-name">시청 시간</div><div class="subkpi-val">${fmt.numK(totalWatch)}<span class="unit">시간</span></div><div class="subkpi-sub">주당 ${fmt.numK(totalWatch/weekly.length)}h</div></div><div class="subkpi"><div class="subkpi-name">총 인게이지먼트</div><div class="subkpi-val">${fmt.numK(totalEng)}</div><div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 조회수 추이</div><div class="chart-sub">롱폼 · 숏폼 흐름 비교</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span></div><div class="chart-canvas tall"><canvas id="ch-views"></canvas></div></div><div class="chart-card"><div class="chart-title">주차별 업로드 건수</div><div class="chart-sub">롱폼 · 숏폼 발행 패턴</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas tall"><canvas id="ch-uploads"></canvas></div></div></div><div class="chart-grid-2" style="margin-top:18px;"><div class="chart-card"><div class="chart-title">평균 시청 비율 추이</div><div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span><span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span></div><div class="chart-canvas"><canvas id="ch-vp"></canvas></div></div><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">시청자 반응 추이</div><div class="ctrl-segment" id="eng-filter" style="font-size:9px;"><button data-eng="all" class="active">전체</button><button data-eng="long">롱폼</button><button data-eng="short">숏폼</button></div></div><div class="chart-sub">좋아요 · 댓글 · 공유 (절대값)</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span><span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span><span><span class="lg-dot" style="background:var(--teal);"></span>공유</span></div><div class="chart-canvas"><canvas id="ch-eng"></canvas></div></div></div></section>`;
 }
 
-// ============ § 03 롱폼 vs 숏폼 ============
 function renderFormatSplit(weekly, videos) {
   const longViews = weekly.reduce((s, w) => s + w.views_long, 0);
   const shortViews = weekly.reduce((s, w) => s + w.views_short, 0);
   const longUploads = weekly.reduce((s, w) => s + w.uploads_long, 0);
   const shortUploads = weekly.reduce((s, w) => s + w.uploads_short, 0);
-  
   const longVideos = videos.filter(v => v.video_type === 'long');
   const shortVideos = videos.filter(v => v.video_type === 'short');
-  
   const longAvg = longUploads > 0 ? longViews / longUploads : 0;
   const shortAvg = shortUploads > 0 ? shortViews / shortUploads : 0;
-  
   const longLikes = longVideos.reduce((s, v) => s + v.likes, 0);
   const longComments = longVideos.reduce((s, v) => s + v.comments, 0);
   const longShares = longVideos.reduce((s, v) => s + v.shares, 0);
   const shortLikes = shortVideos.reduce((s, v) => s + v.likes, 0);
   const shortComments = shortVideos.reduce((s, v) => s + v.comments, 0);
   const shortShares = shortVideos.reduce((s, v) => s + v.shares, 0);
-  
-  // ============ PHASE A 패치: shares 포함 ============
   const longEngRate = longViews > 0 ? ((longLikes + longComments + longShares) / longViews * 100) : 0;
   const shortEngRate = shortViews > 0 ? ((shortLikes + shortComments + shortShares) / shortViews * 100) : 0;
-  // ============================================
-  
-  return `
-    <section class="section">
-      <div class="sec-head">
-        <span class="sec-num">§ 03</span>
-        <span class="sec-title">롱폼 vs <em>숏폼</em></span>
-        <span class="sec-sub">${videos.length}개 영상 · weekly 합계 + 영상 평균</span>
-      </div>
-      
-      <div class="fmt-grid">
-        <div class="fmt-cell">
-          <div class="fmt-eyebrow">▶ LONG-FORM</div>
-          <div class="fmt-name long">롱폼</div>
-          ${[
-            ['업로드', longUploads + '건', longUploads > shortUploads],
-            ['총 조회', fmt.numK(longViews), longViews > shortViews],
-            ['편당 평균 조회', fmt.numK(longAvg), longAvg > shortAvg],
-            ['인게이지먼트율', longEngRate.toFixed(2) + '%', longEngRate > shortEngRate],
-            ['총 좋아요', fmt.numK(longLikes), longLikes > shortLikes],
-            ['총 댓글', fmt.numK(longComments), longComments > shortComments],
-          ].map(([m, v, w]) => `
-            <div class="fmt-row">
-              <span class="metric">${m}</span>
-              <span class="value">${v}${w ? '<span class="winner">HIGH</span>' : ''}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div class="fmt-cell">
-          <div class="fmt-eyebrow">⏵ SHORT-FORM</div>
-          <div class="fmt-name short">숏폼</div>
-          ${[
-            ['업로드', shortUploads + '건', shortUploads > longUploads],
-            ['총 조회', fmt.numK(shortViews), shortViews > longViews],
-            ['편당 평균 조회', fmt.numK(shortAvg), shortAvg > longAvg],
-            ['인게이지먼트율', shortEngRate.toFixed(2) + '%', shortEngRate > longEngRate],
-            ['총 좋아요', fmt.numK(shortLikes), shortLikes > longLikes],
-            ['총 댓글', fmt.numK(shortComments), shortComments > longComments],
-          ].map(([m, v, w]) => `
-            <div class="fmt-row">
-              <span class="metric">${m}</span>
-              <span class="value">${v}${w ? '<span class="winner">HIGH</span>' : ''}</span>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      
-      <div class="chart-grid-2" style="margin-top:24px;">
-        <div class="chart-card">
-          <div class="chart-title">조회수 비중 추이</div>
-          <div class="chart-sub">롱폼 vs 숏폼 누적 조회</div>
-          <div class="chart-canvas"><canvas id="ch-fmt-views"></canvas></div>
-        </div>
-        <div class="chart-card">
-          <div class="chart-title">업로드 비중 추이</div>
-          <div class="chart-sub">주차별 발행 빈도</div>
-          <div class="chart-canvas"><canvas id="ch-fmt-uploads"></canvas></div>
-        </div>
-      </div>
-    </section>
-  `;
+  const cells = (vals) => vals.map(([m, v, w]) => `<div class="fmt-row"><span class="metric">${m}</span><span class="value">${v}${w ? '<span class="winner">HIGH</span>' : ''}</span></div>`).join('');
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 03</span><span class="sec-title">롱폼 vs <em>숏폼</em></span><span class="sec-sub">${videos.length}개 영상 · weekly 합계 + 영상 평균</span></div><div class="fmt-grid"><div class="fmt-cell"><div class="fmt-eyebrow">▶ LONG-FORM</div><div class="fmt-name long">롱폼</div>${cells([['업로드', longUploads + '건', longUploads > shortUploads],['총 조회', fmt.numK(longViews), longViews > shortViews],['편당 평균 조회', fmt.numK(longAvg), longAvg > shortAvg],['인게이지먼트율', longEngRate.toFixed(2) + '%', longEngRate > shortEngRate],['총 좋아요', fmt.numK(longLikes), longLikes > shortLikes],['총 댓글', fmt.numK(longComments), longComments > shortComments]])}</div><div class="fmt-cell"><div class="fmt-eyebrow">⏵ SHORT-FORM</div><div class="fmt-name short">숏폼</div>${cells([['업로드', shortUploads + '건', shortUploads > longUploads],['총 조회', fmt.numK(shortViews), shortViews > longViews],['편당 평균 조회', fmt.numK(shortAvg), shortAvg > longAvg],['인게이지먼트율', shortEngRate.toFixed(2) + '%', shortEngRate > longEngRate],['총 좋아요', fmt.numK(shortLikes), shortLikes > longLikes],['총 댓글', fmt.numK(shortComments), shortComments > longComments]])}</div></div><div class="chart-grid-2" style="margin-top:24px;"><div class="chart-card"><div class="chart-title">조회수 비중 추이</div><div class="chart-sub">롱폼 vs 숏폼 누적 조회</div><div class="chart-canvas"><canvas id="ch-fmt-views"></canvas></div></div><div class="chart-card"><div class="chart-title">업로드 비중 추이</div><div class="chart-sub">주차별 발행 빈도</div><div class="chart-canvas"><canvas id="ch-fmt-uploads"></canvas></div></div></div></section>`;
 }
 
-// ============ § 04 영상 랭킹 ============
 let bwTab = 'views';
 function renderVideoRanking(videos, periodLabel) {
   const valid = videos.filter(v => v.views > 0);
-  
-  if (valid.length === 0) {
-    return `
-      <section class="section">
-        <div class="sec-head">
-          <span class="sec-num">§ 04</span>
-          <span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span>
-          <span class="sec-sub">${periodLabel}</span>
-        </div>
-        <div class="empty">해당 기간에 영상 데이터가 없습니다.</div>
-      </section>
-    `;
-  }
-  
-  const metricLabel = {
-    views: '조회수',
-    engagement: '인게이지먼트율',
-    likes: '좋아요',
-  }[bwTab];
-  
-  const getVal = (v) => {
-    if (bwTab === 'views') return v.views;
-    // ============ PHASE A 패치: shares 포함 ============
-    if (bwTab === 'engagement') return v.views > 0 ? ((v.likes + v.comments + v.shares) / v.views * 100) : 0;
-    // ============================================
-    if (bwTab === 'likes') return v.likes;
-    return 0;
-  };
-  
+  if (valid.length === 0) return `<section class="section"><div class="sec-head"><span class="sec-num">§ 04</span><span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span><span class="sec-sub">${periodLabel}</span></div><div class="empty">해당 기간에 영상 데이터가 없습니다.</div></section>`;
+  const metricLabel = { views: '조회수', engagement: '인게이지먼트율', likes: '좋아요' }[bwTab];
+  const getVal = (v) => bwTab === 'views' ? v.views : bwTab === 'engagement' ? (v.views > 0 ? ((v.likes + v.comments + v.shares) / v.views * 100) : 0) : bwTab === 'likes' ? v.likes : 0;
   const sorted = [...valid].sort((a, b) => getVal(b) - getVal(a));
-  const top = sorted.slice(0, 10);
-  const bottom = sorted.slice(-10).reverse();
-  
-  const fmtVal = (v) => {
-    if (bwTab === 'engagement') return getVal(v).toFixed(2) + '%';
-    return fmt.numK(getVal(v));
-  };
-  
+  const top = sorted.slice(0, 10); const bottom = sorted.slice(-10).reverse();
+  const fmtVal = (v) => bwTab === 'engagement' ? getVal(v).toFixed(2) + '%' : fmt.numK(getVal(v));
   const renderRow = (v, i) => {
     const cls = v.video_type === 'long' ? 'long' : 'short';
     const tag = v.video_type === 'long' ? '▶ 롱폼' : '⏵ 숏폼';
-    return `
-      <tr>
-        <td style="width:24px;color:var(--ink-mute);font-family:var(--mono);font-size:10px;">${i+1}</td>
-        <td class="tag ${cls}">${tag}</td>
-        <td class="title" title="${esc(v.title)}">${esc(v.title)}</td>
-        <td style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);width:80px;">${esc(v.week_label)}</td>
-        <td class="num" style="width:80px;">${fmtVal(v)}</td>
-      </tr>
-    `;
+    return `<tr><td style="width:24px;color:var(--ink-mute);font-family:var(--mono);font-size:10px;">${i+1}</td><td class="tag ${cls}">${tag}</td><td class="title" title="${esc(v.title)}">${esc(v.title)}</td><td style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);width:80px;">${esc(v.week_label)}</td><td class="num" style="width:80px;">${fmtVal(v)}</td></tr>`;
   };
-  
-  return `
-    <section class="section">
-      <div class="sec-head">
-        <span class="sec-num">§ 04</span>
-        <span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span>
-        <span class="sec-sub">${periodLabel} · ${valid.length}개 영상</span>
-      </div>
-      
-      <div class="bw-tabs">
-        <button class="bw-tab ${bwTab === 'views' ? 'active' : ''}" onclick="window._setBW('views')">조회수</button>
-        <button class="bw-tab ${bwTab === 'engagement' ? 'active' : ''}" onclick="window._setBW('engagement')">인게이지먼트율</button>
-        <button class="bw-tab ${bwTab === 'likes' ? 'active' : ''}" onclick="window._setBW('likes')">좋아요</button>
-      </div>
-      
-      <div class="bw-grid-split">
-        <div class="bw-col best">
-          <h4>▲ TOP 10 · ${metricLabel}</h4>
-          <div class="tbl-scroll">
-            <table class="tbl">
-              <thead>
-                <tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr>
-              </thead>
-              <tbody>${top.map((v, i) => renderRow(v, i)).join('')}</tbody>
-            </table>
-          </div>
-        </div>
-        <div class="bw-col worst">
-          <h4>▼ BOTTOM 10 · ${metricLabel}</h4>
-          <div class="tbl-scroll">
-            <table class="tbl">
-              <thead>
-                <tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr>
-              </thead>
-              <tbody>${bottom.map((v, i) => renderRow(v, valid.length - bottom.length + i)).join('')}</tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-  `;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 04</span><span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span><span class="sec-sub">${periodLabel} · ${valid.length}개 영상</span></div><div class="bw-tabs"><button class="bw-tab ${bwTab === 'views' ? 'active' : ''}" onclick="window._setBW('views')">조회수</button><button class="bw-tab ${bwTab === 'engagement' ? 'active' : ''}" onclick="window._setBW('engagement')">인게이지먼트율</button><button class="bw-tab ${bwTab === 'likes' ? 'active' : ''}" onclick="window._setBW('likes')">좋아요</button></div><div class="bw-grid-split"><div class="bw-col best"><h4>▲ TOP 10 · ${metricLabel}</h4><div class="tbl-scroll"><table class="tbl"><thead><tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr></thead><tbody>${top.map((v, i) => renderRow(v, i)).join('')}</tbody></table></div></div><div class="bw-col worst"><h4>▼ BOTTOM 10 · ${metricLabel}</h4><div class="tbl-scroll"><table class="tbl"><thead><tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr></thead><tbody>${bottom.map((v, i) => renderRow(v, valid.length - bottom.length + i)).join('')}</tbody></table></div></div></div></section>`;
 }
 
-window._setBW = (m) => {
-  bwTab = m;
-  renderDash();
-};
+window._setBW = (m) => { bwTab = m; renderDash(); };
 
 // ==============================================
 // CHARTS
@@ -1489,309 +1084,77 @@ Chart.defaults.color = '#5a554d';
 Chart.defaults.borderColor = '#e5e1d8';
 Chart.defaults.font.family = 'JetBrains Mono, monospace';
 Chart.defaults.font.size = 10;
-
-function ma4(arr) {
-  return arr.map((_, i) => {
-    const slice = arr.slice(Math.max(0, i-3), i+1);
-    return slice.reduce((s, x) => s + x, 0) / slice.length;
-  });
-}
+function ma4(arr) { return arr.map((_, i) => { const slice = arr.slice(Math.max(0, i-3), i+1); return slice.reduce((s, x) => s + x, 0) / slice.length; }); }
 
 function buildSubChart(weekly) {
-  const ctx = document.getElementById('ch-sub');
-  if (!ctx) return;
-  const labels = weekly.map(w => w.week_label);
-  const data = weekly.map(w => w.sub_net);
-  const ma = ma4(data);
-  
-  charts.sub = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '주간 순증',
-          data,
-          backgroundColor: data.map(v => v >= 0 ? 'rgba(24,95,165,0.75)' : 'rgba(185,28,28,0.75)'),
-          borderColor: data.map(v => v >= 0 ? '#185FA5' : '#b91c1c'),
-          borderWidth: 1,
-          order: 2,
-        },
-        {
-          type: 'line',
-          label: '4주 MA',
-          data: ma,
-          borderColor: '#D85A30',
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          tension: 0.3,
-          pointRadius: 2,
-          order: 1,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v >= 0 ? '+' + fmt.numK(v) : '−' + fmt.numK(Math.abs(v)) } }
-      }
-    }
-  });
+  const ctx = document.getElementById('ch-sub'); if (!ctx) return;
+  const labels = weekly.map(w => w.week_label); const data = weekly.map(w => w.sub_net); const ma = ma4(data);
+  charts.sub = new Chart(ctx, { type: 'bar', data: { labels, datasets: [
+    { label: '주간 순증', data, backgroundColor: data.map(v => v >= 0 ? 'rgba(24,95,165,0.75)' : 'rgba(185,28,28,0.75)'), borderColor: data.map(v => v >= 0 ? '#185FA5' : '#b91c1c'), borderWidth: 1, order: 2 },
+    { type: 'line', label: '4주 MA', data: ma, borderColor: '#D85A30', backgroundColor: 'transparent', borderWidth: 1.5, tension: 0.3, pointRadius: 2, order: 1 }
+  ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v >= 0 ? '+' + fmt.numK(v) : '−' + fmt.numK(Math.abs(v)) } } } } });
 }
 
 function buildFlowChart(weekly) {
-  const ctx = document.getElementById('ch-flow');
-  if (!ctx) return;
+  const ctx = document.getElementById('ch-flow'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  const gained = weekly.map(w => w.sub_gained);
-  const lost = weekly.map(w => -w.sub_lost);
+  const gained = weekly.map(w => w.sub_gained); const lost = weekly.map(w => -w.sub_lost);
   const hasGainedLost = gained.some(g => g > 0) || lost.some(l => l < 0);
-  
   if (!hasGainedLost) {
-    // sub_net만 표시
-    charts.flow = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'sub_net',
-          data: weekly.map(w => w.sub_net),
-          borderColor: '#185FA5',
-          backgroundColor: 'rgba(24,95,165,0.1)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 2,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-          y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.signed(v) } }
-        }
-      }
-    });
+    charts.flow = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: 'sub_net', data: weekly.map(w => w.sub_net), borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.1)', tension: 0.3, fill: true, pointRadius: 2 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.signed(v) } } } } });
     return;
   }
-  
-  charts.flow = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '신규',
-          data: gained,
-          backgroundColor: 'rgba(21,128,61,0.75)',
-          borderColor: '#15803d',
-          borderWidth: 1,
-        },
-        {
-          label: '이탈',
-          data: lost,
-          backgroundColor: 'rgba(185,28,28,0.75)',
-          borderColor: '#b91c1c',
-          borderWidth: 1,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, stacked: true },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v >= 0 ? '+' + fmt.numK(v) : '−' + fmt.numK(Math.abs(v)) }, stacked: true }
-      }
-    }
-  });
+  charts.flow = new Chart(ctx, { type: 'bar', data: { labels, datasets: [
+    { label: '신규', data: gained, backgroundColor: 'rgba(21,128,61,0.75)', borderColor: '#15803d', borderWidth: 1 },
+    { label: '이탈', data: lost, backgroundColor: 'rgba(185,28,28,0.75)', borderColor: '#b91c1c', borderWidth: 1 }
+  ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 }, stacked: true }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v >= 0 ? '+' + fmt.numK(v) : '−' + fmt.numK(Math.abs(v)) }, stacked: true } } } });
 }
 
-// 주차별 조회수 - 롱폼/숏폼 꺾은선
 function buildViewsChart(weekly) {
-  const ctx = document.getElementById('ch-views');
-  if (!ctx) return;
+  const ctx = document.getElementById('ch-views'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  
-  charts.views = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '롱폼',
-          data: weekly.map(w => w.views_long),
-          borderColor: '#534AB7',
-          backgroundColor: 'rgba(83,74,183,0.08)',
-          tension: 0.3,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          fill: false,
-        },
-        {
-          label: '숏폼',
-          data: weekly.map(w => w.views_short),
-          borderColor: '#D85A30',
-          backgroundColor: 'rgba(216,90,48,0.08)',
-          tension: 0.3,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, beginAtZero: true }
-      }
-    }
-  });
+  charts.views = new Chart(ctx, { type: 'line', data: { labels, datasets: [
+    { label: '롱폼', data: weekly.map(w => w.views_long), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false },
+    { label: '숏폼', data: weekly.map(w => w.views_short), borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false }
+  ]}, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, beginAtZero: true } } } });
 }
 
-// 주차별 업로드 - 롱폼/숏폼 꺾은선
 function buildUploadsChart(weekly) {
-  const ctx = document.getElementById('ch-uploads');
-  if (!ctx) return;
+  const ctx = document.getElementById('ch-uploads'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  
-  charts.uploads = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '롱폼',
-          data: weekly.map(w => w.uploads_long),
-          borderColor: '#534AB7',
-          backgroundColor: 'rgba(83,74,183,0.08)',
-          tension: 0.3,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          fill: false,
-        },
-        {
-          label: '숏폼',
-          data: weekly.map(w => w.uploads_short),
-          borderColor: '#D85A30',
-          backgroundColor: 'rgba(216,90,48,0.08)',
-          tension: 0.3,
-          borderWidth: 2,
-          pointRadius: 3,
-          pointHoverRadius: 5,
-          fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1 }, beginAtZero: true }
-      }
-    }
-  });
+  charts.uploads = new Chart(ctx, { type: 'line', data: { labels, datasets: [
+    { label: '롱폼', data: weekly.map(w => w.uploads_long), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false },
+    { label: '숏폼', data: weekly.map(w => w.uploads_short), borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5, fill: false }
+  ]}, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1 }, beginAtZero: true } } } });
 }
 
-// 평균 시청 비율 - 롱폼/숏폼 가중평균
 function buildVPChart(weekly, videos) {
-  const ctx = document.getElementById('ch-vp');
-  if (!ctx) return;
+  const ctx = document.getElementById('ch-vp'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  
-  const longVP = [];
-  const shortVP = [];
-  const channelVP = [];
-  
+  const longVP = [], shortVP = [], channelVP = [];
   weekly.forEach(w => {
     const wkVideos = videos.filter(v => v.week_label === w.week_label);
     const longVids = wkVideos.filter(v => v.video_type === 'long');
     const shortVids = wkVideos.filter(v => v.video_type === 'short');
-    
-    const calcWeightedVP = (vids) => {
+    const calc = (vids) => {
       const valid = vids.filter(v => v.avg_view_pct && v.views > 0);
       if (valid.length === 0) return null;
       const totalViews = valid.reduce((s, v) => s + v.views, 0);
       const weighted = valid.reduce((s, v) => s + (v.avg_view_pct * v.views), 0);
       return totalViews > 0 ? weighted / totalViews : null;
     };
-    
-    longVP.push(calcWeightedVP(longVids));
-    shortVP.push(calcWeightedVP(shortVids));
-    channelVP.push(w.avg_view_pct || null);
+    longVP.push(calc(longVids)); shortVP.push(calc(shortVids)); channelVP.push(w.avg_view_pct || null);
   });
-  
-  const hasLongData = longVP.some(v => v !== null);
-  const hasShortData = shortVP.some(v => v !== null);
-  
   const datasets = [];
-  
-  if (hasLongData) {
-    datasets.push({
-      label: '롱폼',
-      data: longVP,
-      borderColor: '#534AB7',
-      backgroundColor: 'rgba(83,74,183,0.08)',
-      tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false, spanGaps: true,
-    });
-  }
-  if (hasShortData) {
-    datasets.push({
-      label: '숏폼',
-      data: shortVP,
-      borderColor: '#D85A30',
-      backgroundColor: 'rgba(216,90,48,0.08)',
-      tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false, spanGaps: true,
-    });
-  }
-  
-  datasets.push({
-    label: '채널 평균',
-    data: channelVP,
-    borderColor: '#9c968a',
-    backgroundColor: 'transparent',
-    tension: 0.3, borderWidth: 1.5, pointRadius: 2, fill: false, 
-    borderDash: [4, 3], spanGaps: true,
-  });
-  
-  charts.vp = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { 
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw == null ? '데이터 없음' : ctx.raw.toFixed(1) + '%')
-          }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v + '%' }, beginAtZero: true }
-      }
-    }
-  });
+  if (longVP.some(v => v !== null)) datasets.push({ label: '롱폼', data: longVP, borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false, spanGaps: true });
+  if (shortVP.some(v => v !== null)) datasets.push({ label: '숏폼', data: shortVP, borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false, spanGaps: true });
+  datasets.push({ label: '채널 평균', data: channelVP, borderColor: '#9c968a', backgroundColor: 'transparent', tension: 0.3, borderWidth: 1.5, pointRadius: 2, fill: false, borderDash: [4, 3], spanGaps: true });
+  charts.vp = new Chart(ctx, { type: 'line', data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw == null ? '데이터 없음' : ctx.raw.toFixed(1) + '%') } } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v + '%' }, beginAtZero: true } } } });
 }
 
 let engFilter = 'all';
-
 function buildEngagementChart(weekly, videos) {
-  const ctx = document.getElementById('ch-eng');
-  if (!ctx) return;
-  
+  const ctx = document.getElementById('ch-eng'); if (!ctx) return;
   document.querySelectorAll('#eng-filter button').forEach(btn => {
     btn.onclick = () => {
       engFilter = btn.dataset.eng;
@@ -1801,167 +1164,52 @@ function buildEngagementChart(weekly, videos) {
       buildEngagementChart(weekly, videos);
     };
   });
-  
   const labels = weekly.map(w => w.week_label);
-  
   let likes, comments, shares;
-  
-  if (engFilter === 'all') {
-    likes = weekly.map(w => w.likes);
-    comments = weekly.map(w => w.comments);
-    shares = weekly.map(w => w.shares);
-  } else {
-    const targetType = engFilter;
-    likes = weekly.map(w => {
-      const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
-      return wkVids.reduce((s, v) => s + v.likes, 0);
-    });
-    comments = weekly.map(w => {
-      const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
-      return wkVids.reduce((s, v) => s + v.comments, 0);
-    });
-    shares = weekly.map(w => {
-      const wkVids = videos.filter(v => v.week_label === w.week_label && v.video_type === targetType);
-      return wkVids.reduce((s, v) => s + v.shares, 0);
-    });
+  if (engFilter === 'all') { likes = weekly.map(w => w.likes); comments = weekly.map(w => w.comments); shares = weekly.map(w => w.shares); }
+  else {
+    const t = engFilter;
+    likes = weekly.map(w => videos.filter(v => v.week_label === w.week_label && v.video_type === t).reduce((s, v) => s + v.likes, 0));
+    comments = weekly.map(w => videos.filter(v => v.week_label === w.week_label && v.video_type === t).reduce((s, v) => s + v.comments, 0));
+    shares = weekly.map(w => videos.filter(v => v.week_label === w.week_label && v.video_type === t).reduce((s, v) => s + v.shares, 0));
   }
-  
-  charts.eng = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '좋아요',
-          data: likes,
-          borderColor: '#D4537E',
-          backgroundColor: 'rgba(212,83,126,0.08)',
-          tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false,
-        },
-        {
-          label: '댓글',
-          data: comments,
-          borderColor: '#185FA5',
-          backgroundColor: 'rgba(24,95,165,0.08)',
-          tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false,
-        },
-        {
-          label: '공유',
-          data: shares,
-          borderColor: '#1D9E75',
-          backgroundColor: 'rgba(29,158,117,0.08)',
-          tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { 
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => ctx.dataset.label + ': ' + fmt.num(ctx.raw)
-          }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, beginAtZero: true }
-      }
-    }
-  });
+  charts.eng = new Chart(ctx, { type: 'line', data: { labels, datasets: [
+    { label: '좋아요', data: likes, borderColor: '#D4537E', backgroundColor: 'rgba(212,83,126,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false },
+    { label: '댓글', data: comments, borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false },
+    { label: '공유', data: shares, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false }
+  ]}, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmt.num(ctx.raw) } } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) }, beginAtZero: true } } } });
 }
 
 function buildFormatViewsChart(weekly) {
-  const ctx = document.getElementById('ch-fmt-views');
-  if (!ctx) return;
+  const ctx = document.getElementById('ch-fmt-views'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  
-  charts.fmtViews = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '롱폼 조회',
-          data: weekly.map(w => w.views_long),
-          borderColor: '#534AB7',
-          backgroundColor: 'rgba(83,74,183,0.1)',
-          tension: 0.3,
-          pointRadius: 1.5,
-        },
-        {
-          label: '숏폼 조회',
-          data: weekly.map(w => w.views_short),
-          borderColor: '#D85A30',
-          backgroundColor: 'rgba(216,90,48,0.1)',
-          tension: 0.3,
-          pointRadius: 1.5,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) } }
-      }
-    }
-  });
+  charts.fmtViews = new Chart(ctx, { type: 'line', data: { labels, datasets: [
+    { label: '롱폼 조회', data: weekly.map(w => w.views_long), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.1)', tension: 0.3, pointRadius: 1.5 },
+    { label: '숏폼 조회', data: weekly.map(w => w.views_short), borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.1)', tension: 0.3, pointRadius: 1.5 }
+  ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v) } } } } });
 }
 
 function buildFormatUploadsChart(weekly) {
-  const ctx = document.getElementById('ch-fmt-uploads');
-  if (!ctx) return;
+  const ctx = document.getElementById('ch-fmt-uploads'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  
-  charts.fmtUp = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '롱폼',
-          data: weekly.map(w => w.uploads_long),
-          borderColor: '#534AB7',
-          backgroundColor: 'rgba(83,74,183,0.1)',
-          tension: 0.3,
-          pointRadius: 2,
-        },
-        {
-          label: '숏폼',
-          data: weekly.map(w => w.uploads_short),
-          borderColor: '#D85A30',
-          backgroundColor: 'rgba(216,90,48,0.1)',
-          tension: 0.3,
-          pointRadius: 2,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } },
-        y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1 }, beginAtZero: true }
-      }
-    }
-  });
+  charts.fmtUp = new Chart(ctx, { type: 'line', data: { labels, datasets: [
+    { label: '롱폼', data: weekly.map(w => w.uploads_long), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.1)', tension: 0.3, pointRadius: 2 },
+    { label: '숏폼', data: weekly.map(w => w.uploads_short), borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.1)', tension: 0.3, pointRadius: 2 }
+  ]}, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1 }, beginAtZero: true } } } });
 }
 
 // ==============================================
 // EVENT BINDINGS
 // ==============================================
+document.querySelectorAll('.vt-btn').forEach(btn => { btn.onclick = () => setView(btn.dataset.view); });
 document.querySelectorAll('#period-tabs button').forEach(btn => {
   btn.onclick = () => {
     STATE.period = btn.dataset.period;
     document.querySelectorAll('#period-tabs button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderDash();
+    btn.classList.add('active'); renderDash();
   };
 });
+document.getElementById('mat-modal').onclick = (e) => { if (e.target.id === 'mat-modal') window._closeMatModal(); };
 
 // ==============================================
 // INIT
@@ -1970,34 +1218,18 @@ async function init() {
   try {
     await loadData();
     if (DATA.masters.length === 0) throw new Error('creators_master 데이터 없음');
-    
     document.getElementById('loading').style.display = 'none';
     document.getElementById('app').style.display = 'block';
-    
     renderCreatorTabs();
-    renderDash();
+    setView('overview');
   } catch (err) {
     console.error('[Init failed]', err);
     const errMsg = err.message || String(err);
     let hint = '';
     if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
-      hint = `
-        <div style="margin-top:20px;padding:14px 18px;background:var(--bg-soft);border-left:3px solid var(--red);text-align:left;max-width:560px;font-family:var(--sans);font-size:12.5px;line-height:1.7;color:var(--ink);">
-          <strong>가능한 원인:</strong><br/>
-          1. HTML을 <strong>로컬 파일(file://)</strong>로 직접 열었을 때 → 반드시 GitHub Pages 또는 로컬 서버로 열어주세요<br/>
-          2. Google Sheets 게시(Publish to web) 설정이 풀렸을 가능성 → 파일 → 공유 → 웹에 게시 다시 확인<br/>
-          3. 네트워크 차단 (회사 방화벽 등)<br/>
-          <br/>
-          <strong>확인 방법:</strong> 브라우저 F12 → Console 탭에서 정확한 에러 메시지 확인
-        </div>
-      `;
+      hint = `<div style="margin-top:20px;padding:14px 18px;background:var(--bg-soft);border-left:3px solid var(--red);text-align:left;max-width:560px;font-family:var(--sans);font-size:12.5px;line-height:1.7;color:var(--ink);"><strong>가능한 원인:</strong><br/>1. HTML을 로컬 파일(file://)로 직접 열었을 때 → GitHub Pages 또는 로컬 서버로 열어주세요<br/>2. Google Sheets 게시 설정이 풀렸을 가능성<br/>3. 네트워크 차단</div>`;
     }
-    document.getElementById('loading').innerHTML = `
-      <div class="title" style="color:var(--red);">로드 실패</div>
-      <div class="sub" style="margin-top:8px;">${esc(errMsg)}</div>
-      ${hint}
-      <button onclick="location.reload()" style="margin-top:24px;padding:8px 20px;background:var(--ink);color:white;border:none;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;cursor:pointer;">RETRY</button>
-    `;
+    document.getElementById('loading').innerHTML = `<div class="title" style="color:var(--red);">로드 실패</div><div class="sub" style="margin-top:8px;">${esc(errMsg)}</div>${hint}<button onclick="location.reload()" style="margin-top:24px;padding:8px 20px;background:var(--ink);color:white;border:none;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;cursor:pointer;">RETRY</button>`;
   }
 }
 
