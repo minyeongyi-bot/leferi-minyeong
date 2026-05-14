@@ -55,6 +55,16 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 .ctrl-segment button:last-child { border-right: none; }
 .ctrl-segment button:hover { background: var(--bg-card); }
 .ctrl-segment button.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+/* 사용자지정 날짜 입력 */
+.date-range { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 11px; color: var(--ink-soft); }
+.date-range input[type="date"] { font-family: var(--mono); font-size: 11px; padding: 5px 8px; border: 1px solid var(--ink); background: var(--bg); color: var(--ink); letter-spacing: 0.02em; }
+.date-range input[type="date"]:focus { outline: none; border-color: var(--accent); }
+.date-range .sep { color: var(--ink-mute); padding: 0 2px; }
+.date-range .apply-btn { background: var(--ink); color: var(--bg); border: none; font-family: var(--mono); font-size: 10px; padding: 6px 11px; letter-spacing: 0.12em; cursor: pointer; font-weight: 600; }
+.date-range .apply-btn:hover { background: var(--accent); }
+.date-range .reset-btn { background: transparent; color: var(--ink-mute); border: 1px solid var(--line); font-family: var(--mono); font-size: 10px; padding: 6px 9px; letter-spacing: 0.12em; cursor: pointer; }
+.date-range .reset-btn:hover { color: var(--ink); border-color: var(--ink); }
+.date-range-hint { font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.05em; margin-left: 4px; }
 .ctrl-status { margin-left: auto; display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.08em; }
 .ctrl-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -166,20 +176,24 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 /* v14 §A 매트릭스 */
 .matrix-wrap { border: 1px solid var(--line); background: var(--bg); margin-bottom: 18px; }
 .matrix-table { width: 100%; border-collapse: collapse; }
-.matrix-table thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; text-align: center; padding: 18px 12px; border-bottom: 1.5px solid var(--ink); }
+.matrix-table thead th { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); font-weight: 600; text-align: center; padding: 12px 10px; border-bottom: 1.5px solid var(--ink); }
 .matrix-table thead th.row-head { text-align: left; padding-left: 24px; width: 160px; }
-.matrix-table tbody td { text-align: center; padding: 26px 12px; border-bottom: 1px solid var(--line-soft); font-family: var(--mono); vertical-align: middle; }
+.matrix-table tbody td { text-align: center; padding: 14px 10px; border-bottom: 1px solid var(--line-soft); font-family: var(--mono); vertical-align: middle; }
 .matrix-table tbody tr:last-child td { border-bottom: none; }
-.matrix-table tbody .tier-label { text-align: left; padding-left: 24px; font-family: var(--sans); font-size: 14px; font-weight: 500; color: var(--ink); }
+.matrix-table tbody .tier-label { text-align: left; padding-left: 24px; font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink); }
 .matrix-cell { position: relative; }
 .matrix-cell.has-data { cursor: pointer; transition: background 0.15s ease; }
 .matrix-cell.has-data:hover { background: var(--bg-soft); }
-.matrix-cell .cell-count { display: block; font-family: var(--serif); font-size: 24px; font-weight: 500; color: var(--ink); line-height: 1.1; }
-.matrix-cell .cell-status { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; }
-.matrix-cell .cell-status.healthy { color: var(--green); } .matrix-cell .cell-status.watch { color: var(--amber); } .matrix-cell .cell-status.high { color: var(--red); }
+/* 상태 pill이 메인 시각요소, 인원수는 보조 */
+.matrix-cell .cell-status { display: inline-flex; align-items: center; gap: 6px; font-family: var(--sans); font-size: 13px; font-weight: 600; letter-spacing: -0.005em; padding: 5px 11px; border: 1.5px solid; line-height: 1; }
+.matrix-cell .cell-status.healthy { color: var(--green); border-color: var(--green); background: var(--green-bg); }
+.matrix-cell .cell-status.watch { color: var(--amber); border-color: var(--amber); background: var(--amber-bg); }
+.matrix-cell .cell-status.high { color: var(--red); border-color: var(--red); background: var(--red-bg); }
+.matrix-cell .cell-count { display: block; font-family: var(--mono); font-size: 10px; font-weight: 500; color: var(--ink-mute); margin-top: 6px; letter-spacing: 0.05em; }
+.matrix-cell .cell-pending { display: inline-block; font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.05em; padding: 5px 11px; border: 1px dashed var(--line); }
 .status-dot-mat { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
 .status-dot-mat.healthy { background: var(--green); } .status-dot-mat.watch { background: var(--amber); } .status-dot-mat.high { background: var(--red); }
-.matrix-cell.no-tier { color: var(--ink-mute); font-size: 16px; }
+.matrix-cell.no-tier { color: var(--ink-mute); font-size: 14px; }
 .matrix-row-total { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink-soft); background: var(--bg-soft); }
 .matrix-legend { padding: 12px 24px; border-top: 1px solid var(--line-soft); background: var(--bg-soft); display: flex; align-items: center; gap: 18px; font-family: var(--mono); font-size: 10px; color: var(--ink-soft); letter-spacing: 0.05em; }
 .matrix-legend-item { display: inline-flex; align-items: center; gap: 6px; }
@@ -283,6 +297,15 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
       <button data-period="last4">최근 4주</button>
       <button data-period="last8">8주</button>
       <button data-period="last12">12주</button>
+      <button data-period="custom">사용자지정</button>
+    </div>
+    <div id="period-custom-range" class="date-range" style="display:none;">
+      <input type="date" id="period-from" />
+      <span class="sep">~</span>
+      <input type="date" id="period-to" />
+      <button class="apply-btn" id="period-apply">적용</button>
+      <button class="reset-btn" id="period-reset">초기화</button>
+      <span class="date-range-hint" id="period-range-hint"></span>
     </div>
   </div>
   <div class="ctrl-status">
@@ -507,7 +530,17 @@ function dateToWeekLabel(dateStr) {
 // DATA STATE
 // ==============================================
 let DATA = { masters: [], weekly: [], videos: [] };
-let STATE = { view: 'overview', creatorIdx: 0, period: 'all', tierFilter: '★ 메가' };
+let STATE = {
+  view: 'overview',
+  creatorIdx: 0,
+  period: 'all',          // 상세뷰 §01~§03 기간
+  periodCustom: null,     // {from: 'YYYY-MM-DD', to: 'YYYY-MM-DD'}
+  rankPeriod: 'all',      // §04 영상 랭킹 독립 기간
+  rankCustom: null,
+  tierFilter: '★ 메가',
+  overviewPeriod: 'all',  // 전사 §B 기간
+  overviewCustom: null,
+};
 const charts = {};
 function destroyCharts() {
   Object.values(charts).forEach(c => { try { c.destroy(); } catch(e) {} });
@@ -603,7 +636,55 @@ function filterByPeriod(weekly) {
   if (p === 'last4') return weekly.slice(-4);
   if (p === 'last8') return weekly.slice(-8);
   if (p === 'last12') return weekly.slice(-12);
+  if (p === 'custom' && STATE.periodCustom) {
+    return filterWeeklyByDateRange(weekly, STATE.periodCustom.from, STATE.periodCustom.to);
+  }
   return weekly;
+}
+
+// 날짜 범위로 weekly 필터링 (week_start가 from~to 사이에 있는 주차만)
+function filterWeeklyByDateRange(weekly, from, to) {
+  if (!from && !to) return weekly;
+  return weekly.filter(w => {
+    if (!w.week_start) return false;
+    if (from && w.week_start < from) return false;
+    if (to && w.week_start > to) return false;
+    return true;
+  });
+}
+
+// 날짜 범위로 videos 필터링 (published_at 기준)
+function filterVideosByDateRange(videos, from, to) {
+  if (!from && !to) return videos;
+  return videos.filter(v => {
+    if (!v.published_at) return false;
+    const d = v.published_at.split('T')[0].split(' ')[0]; // YYYY-MM-DD만 추출
+    if (from && d < from) return false;
+    if (to && d > to) return false;
+    return true;
+  });
+}
+
+// 데이터 범위(가장 이른~가장 늦은 주차) 반환
+function getDataRange(weekly) {
+  if (!weekly || weekly.length === 0) return null;
+  const sorted = [...weekly].filter(w => w.week_start).sort((a,b) => a.week_start.localeCompare(b.week_start));
+  if (sorted.length === 0) return null;
+  return { min: sorted[0].week_start, max: sorted[sorted.length-1].week_start };
+}
+
+// 기간명 추출
+function getPeriodLabel(period, custom) {
+  if (period === 'all') return '전체 기간';
+  if (period === 'last4') return '최근 4주';
+  if (period === 'last8') return '최근 8주';
+  if (period === 'last12') return '최근 12주';
+  if (period === 'custom' && custom) {
+    const from = custom.from || '시작';
+    const to = custom.to || '오늘';
+    return `${from} ~ ${to}`;
+  }
+  return '전체 기간';
 }
 
 function filterVideosByPeriodWeeks(videos, periodWeeks) {
@@ -744,12 +825,17 @@ function renderMatrixSection() {
     const tds = ALL_LABELS.map(label => {
       const cell = cells[tier][label]; rowTotal += cell.count;
       if (cell.count === 0) return `<td class="matrix-cell no-tier">—</td>`;
-      const statusHtml = cell.status
+      // 상태가 메인 (큰 pill), 인원수는 작게 아래
+      const mainHtml = cell.status
         ? `<span class="cell-status ${cell.status}"><span class="status-dot-mat ${cell.status}"></span>${cell.status === 'healthy' ? '안전' : cell.status === 'watch' ? '주의' : '위험'}</span>`
-        : `<span class="cell-status" style="color:var(--ink-mute);font-size:9px;">데이터 ${cell.dataCount}/${cell.count}</span>`;
-      return `<td class="matrix-cell has-data" onclick="window._openMatModal('${esc(tier)}','${esc(label)}')">
-        <span class="cell-count">${cell.count}명</span>
-        ${statusHtml}
+        : `<span class="cell-pending">데이터 ${cell.dataCount}/${cell.count}</span>`;
+      // 1명이면 직행, 여러 명이면 모달
+      const onclick = cell.count === 1
+        ? `window._jumpToDetail('${esc(cell.members[0].name)}')`
+        : `window._openMatModal('${esc(tier)}','${esc(label)}')`;
+      return `<td class="matrix-cell has-data" onclick="${onclick}">
+        ${mainHtml}
+        <span class="cell-count">${cell.count}명${cell.count === 1 ? ' · 클릭 시 상세 →' : ''}</span>
       </td>`;
     }).join('');
     return `<tr>
@@ -765,7 +851,7 @@ function renderMatrixSection() {
       <div class="sec-head">
         <span class="sec-num">§ A · MATRIX</span>
         <span class="sec-title">크리에이터 <em>등급 현황</em></span>
-        <span class="sec-sub">셀 클릭 시 해당 그룹 크리에이터 목록</span>
+        <span class="sec-sub">셀 클릭 → 상세 / 1명 이상은 멤버 목록</span>
       </div>
       <div class="matrix-wrap">
         <table class="matrix-table">
@@ -773,7 +859,7 @@ function renderMatrixSection() {
             <tr>
               <th class="row-head">TIER ↓ / LABEL →</th>
               ${labelHeaders}
-              <th style="width:90px;">합계</th>
+              <th style="width:80px;">합계</th>
             </tr>
           </thead>
           <tbody>
@@ -789,7 +875,7 @@ function renderMatrixSection() {
           <span class="matrix-legend-item"><span class="status-dot-mat healthy"></span>안전</span>
           <span class="matrix-legend-item"><span class="status-dot-mat watch"></span>주의</span>
           <span class="matrix-legend-item"><span class="status-dot-mat high"></span>위험</span>
-          <span style="margin-left:auto;">※ 활성 데이터가 있는 셀만 상태점 표시 · 분류 기준: 2025 매출 + 구독자 합성 스코어 (50:50)</span>
+          <span style="margin-left:auto;">※ 활성 데이터가 있는 셀만 상태 표시 · 분류 기준: 2025 매출 + 구독자 합성 스코어 (50:50)</span>
         </div>
       </div>
     </section>
@@ -801,71 +887,178 @@ function renderTierRankingSection() {
   const tierCounts = {};
   TIERS.forEach(t => { tierCounts[t] = ALL_LABELS.reduce((s, l) => s + cells[t][l].count, 0); });
   const tier = STATE.tierFilter;
+  const ovP = STATE.overviewPeriod; // 'all' | 'last4' | 'last8' | 'last12' | 'custom'
+  const periodLabel = getPeriodLabel(ovP, STATE.overviewCustom);
+  const periodWeeks = ovP === 'last4' ? 4 : ovP === 'last8' ? 8 : ovP === 'last12' ? 12 : null;
+  const isCustom = ovP === 'custom' && STATE.overviewCustom;
+
   const members = [];
   ALL_LABELS.forEach(l => { cells[tier][l].members.forEach(m => members.push(m)); });
+
+  // 각 멤버에 대해 선택 기간 기준 지표 계산
   members.forEach(m => {
-    if (m.hasData) {
-      const weekly = getCreatorWeekly(m.master);
-      m._subDelta = weekly.reduce((s, w) => s + w.sub_net, 0);
-      const validVP = weekly.filter(w => w.avg_view_pct > 0);
-      m._avgVP = validVP.length > 0 ? validVP.reduce((s, w) => s + w.avg_view_pct, 0) / validVP.length : 0;
-    } else { m._subDelta = null; m._avgVP = null; }
+    if (!m.hasData) {
+      m._stats = null; return;
+    }
+    const allWeekly = getCreatorWeekly(m.master);
+    let wk;
+    if (isCustom) {
+      wk = filterWeeklyByDateRange(allWeekly, STATE.overviewCustom.from, STATE.overviewCustom.to);
+    } else {
+      wk = periodWeeks ? allWeekly.slice(-periodWeeks) : allWeekly;
+    }
+    if (wk.length === 0) { m._stats = null; return; }
+
+    // 현재 구독자: 가장 최근 주의 subscribers (없으면 baseline + 누적 net)
+    const latestSubs = wk[wk.length - 1].subscribers ||
+                        (num(m.master.subscribers_baseline) + allWeekly.reduce((s, w) => s + w.sub_net, 0));
+    const totalNet = wk.reduce((s, w) => s + w.sub_net, 0);
+    const weeks = wk.length;
+    const avgPerWeek = totalNet / weeks;
+    const totalUploads = wk.reduce((s, w) => s + w.uploads_total, 0);
+    const totalEng = wk.reduce((s, w) => s + w.likes + w.comments + w.shares, 0);
+
+    // 직전 동일 기간 대비 비교 (기간 필터 켜진 경우만)
+    let prevTotalNet = null;
+    if (periodWeeks && allWeekly.length >= periodWeeks * 2) {
+      const prev = allWeekly.slice(-periodWeeks * 2, -periodWeeks);
+      prevTotalNet = prev.reduce((s, w) => s + w.sub_net, 0);
+    } else if (isCustom && wk.length > 0) {
+      // 같은 길이의 직전 기간 추출 (week_start 기준)
+      const wkStartIdx = allWeekly.findIndex(w => w.week_start === wk[0].week_start);
+      if (wkStartIdx >= wk.length) {
+        const prev = allWeekly.slice(wkStartIdx - wk.length, wkStartIdx);
+        prevTotalNet = prev.reduce((s, w) => s + w.sub_net, 0);
+      }
+    }
+    let deltaPct = null;
+    if (prevTotalNet !== null && Math.abs(prevTotalNet) > 0) {
+      deltaPct = ((totalNet - prevTotalNet) / Math.abs(prevTotalNet)) * 100;
+    }
+
+    m._stats = { latestSubs, totalNet, avgPerWeek, weeks, totalUploads, totalEng, deltaPct };
   });
+
+  // 정렬: 데이터 있는 사람 우선, 그 안에서 기간 합계 순증 내림차순
   members.sort((a, b) => {
     if (a.hasData && !b.hasData) return -1;
     if (!a.hasData && b.hasData) return 1;
-    if (a.hasData && b.hasData) return b._subDelta - a._subDelta;
+    if (a.hasData && b.hasData) return b._stats.totalNet - a._stats.totalNet;
     return b.score - a.score;
   });
+
   const rows = members.map((m, i) => {
     const rankClass = i === 0 ? '' : i === 1 ? 'rk-2' : i === 2 ? 'rk-3' : 'rk-rest';
-    const subsCell = m.subs > 0 ? fmt.subsMan(m.subs) : '—';
-    let deltaCell = '<span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">데이터 대기</span>';
-    let vpCell = '<span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">—</span>';
-    let statusCell = '<span class="rank-status-pill nodata">대기</span>';
-    if (m.hasData) {
-      const sign = m._subDelta >= 0 ? '+' : '';
-      const cls = m._subDelta >= 0 ? 'pos' : 'neg';
-      deltaCell = `<span class="rank-num-val ${cls}">${sign}${fmt.num(m._subDelta)}</span>`;
-      vpCell = `<span class="rank-num-val">${m._avgVP.toFixed(1)}%</span>`;
-      const label = m.healthGrade === 'healthy' ? '안전' : m.healthGrade === 'watch' ? '주의' : '위험';
-      statusCell = `<span class="rank-status-pill ${m.healthGrade}">${label}</span>`;
+    if (!m.hasData) {
+      return `<tr>
+        <td class="rank-num"><span class="${rankClass}">${i+1}</span></td>
+        <td class="rank-creator">${esc(m.name)}</td>
+        <td class="rank-label">${esc(m.label)}</td>
+        <td class="rank-num-val" style="color:var(--ink-soft);">${m.subs > 0 ? fmt.subsMan(m.subs) : '—'}</td>
+        <td><span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">데이터 대기</span></td>
+        <td><span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">—</span></td>
+        <td><span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">—</span></td>
+        <td><span style="color:var(--ink-mute);font-family:var(--mono);font-size:11px;">—</span></td>
+        <td><span class="rank-status-pill nodata">대기</span></td>
+      </tr>`;
     }
+    const s = m._stats;
+    const subsCell = `<span class="rank-num-val" style="color:var(--ink);">${fmt.subsMan(s.latestSubs / 10000)}</span>`;
+    const netSign = s.totalNet >= 0 ? '+' : '';
+    const netCls = s.totalNet >= 0 ? 'pos' : 'neg';
+    let netMain = `<span class="rank-num-val ${netCls}">${netSign}${fmt.num(s.totalNet)}</span>`;
+    if (s.deltaPct !== null) {
+      const dSign = s.deltaPct >= 0 ? '+' : '';
+      const dCls = s.deltaPct >= 0 ? 'pos' : 'neg';
+      netMain += `<div style="font-family:var(--mono);font-size:10px;color:${s.deltaPct >= 0 ? 'var(--green)' : 'var(--red)'};margin-top:2px;">${dSign}${s.deltaPct.toFixed(0)}% vs 직전</div>`;
+    }
+    const avgSign = s.avgPerWeek >= 0 ? '+' : '';
+    const avgCls = s.avgPerWeek >= 0 ? 'pos' : 'neg';
+    const avgCell = `<span class="rank-num-val ${avgCls}">${avgSign}${fmt.num(s.avgPerWeek)}<span style="font-size:10px;color:var(--ink-mute);font-weight:400;">/주</span></span>`;
+    const upCell = `<span class="rank-num-val" style="color:var(--ink);">${s.totalUploads}<span style="font-size:10px;color:var(--ink-mute);font-weight:400;">건</span></span>`;
+    const engCell = `<span class="rank-num-val" style="color:var(--ink);">${fmt.numK(s.totalEng)}</span>`;
+    const label = m.healthGrade === 'healthy' ? '안전' : m.healthGrade === 'watch' ? '주의' : '위험';
+    const statusCell = `<span class="rank-status-pill ${m.healthGrade}">${label}</span>`;
     return `<tr>
       <td class="rank-num"><span class="${rankClass}">${i+1}</span></td>
-      <td class="rank-creator">${esc(m.name)}</td>
+      <td class="rank-creator" style="cursor:pointer;" onclick="window._jumpToDetail('${esc(m.name)}')">${esc(m.name)} <span style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-left:4px;letter-spacing:0.1em;">→</span></td>
       <td class="rank-label">${esc(m.label)}</td>
-      <td class="rank-num-val" style="color:var(--ink-soft);">${subsCell}</td>
-      <td>${deltaCell}</td>
-      <td>${vpCell}</td>
+      <td>${subsCell}</td>
+      <td>${netMain}</td>
+      <td>${avgCell}</td>
+      <td>${upCell}</td>
+      <td>${engCell}</td>
       <td>${statusCell}</td>
     </tr>`;
   }).join('');
+
   const tabsHtml = TIERS.map(t => {
     const active = STATE.tierFilter === t ? 'active' : '';
     const dis = tierCounts[t] === 0 ? 'disabled' : '';
     return `<button class="tier-tab ${active}" ${dis} onclick="window._setTier('${esc(t)}')">${esc(t)} <span class="count">${tierCounts[t]}명</span></button>`;
   }).join('');
+
+  const periodTabsHtml = ['all', 'last4', 'last8', 'last12', 'custom'].map(p => {
+    const lbl = { all: '전체', last4: '최근 4주', last8: '8주', last12: '12주', custom: '사용자지정' }[p];
+    const active = STATE.overviewPeriod === p ? 'active' : '';
+    return `<button class="${active}" onclick="window._setOvPeriod('${p}')">${lbl}</button>`;
+  }).join('');
+
+  // §B 사용자지정 데이터 범위 계산 (데이터 있는 멤버 전체 범위의 최소~최대)
+  let ovDataRange = null;
+  if (isCustom || STATE.overviewPeriod === 'custom') {
+    const allDates = [];
+    members.forEach(m => {
+      if (m.hasData) {
+        const wk = getCreatorWeekly(m.master);
+        wk.forEach(w => { if (w.week_start) allDates.push(w.week_start); });
+      }
+    });
+    if (allDates.length > 0) {
+      allDates.sort();
+      ovDataRange = { min: allDates[0], max: allDates[allDates.length - 1] };
+    }
+  }
+
+  const ovCustomUI = STATE.overviewPeriod === 'custom' ? `
+    <div class="date-range" style="margin-left:14px;">
+      <input type="date" id="ov-from" value="${STATE.overviewCustom?.from || (ovDataRange?.min || '')}" />
+      <span class="sep">~</span>
+      <input type="date" id="ov-to" value="${STATE.overviewCustom?.to || (ovDataRange?.max || '')}" />
+      <button class="apply-btn" onclick="window._applyOvCustom()">적용</button>
+      <button class="reset-btn" onclick="window._resetOvPeriod()">초기화</button>
+      ${ovDataRange ? `<span class="date-range-hint">데이터 범위: ${ovDataRange.min} ~ ${ovDataRange.max}</span>` : ''}
+    </div>` : '';
+
   return `
     <section class="section">
       <div class="sec-head">
         <span class="sec-num">§ B · TIER RANKING</span>
         <span class="sec-title">등급별 <em>랭킹</em></span>
-        <span class="sec-sub">동일 체급끼리 비교 · 기간 구독순증 기준</span>
+        <span class="sec-sub">${periodLabel} · 동일 체급끼리 비교</span>
       </div>
       <div class="tier-tabs">${tabsHtml}</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap;">
+        <span class="ctrl-label">Period</span>
+        <div class="ctrl-segment" id="ov-period-tabs">${periodTabsHtml}</div>
+        ${ovCustomUI}
+        ${(!isCustom && periodWeeks) ? `<span style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);letter-spacing:0.05em;">기간 합계 + 주당 평균 표시 · 직전 ${periodWeeks}주와 비교</span>` : ''}
+        ${(!isCustom && !periodWeeks) ? `<span style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);letter-spacing:0.05em;">누적 합계 표시</span>` : ''}
+      </div>
       ${members.length === 0 ? `<div class="empty">${esc(tier)} 등급에 해당하는 크리에이터가 없습니다.</div>` : `
-      <div style="border:1px solid var(--line);">
-        <table class="rank-table">
+      <div style="border:1px solid var(--line);overflow-x:auto;">
+        <table class="rank-table" style="min-width:880px;">
           <thead>
             <tr>
               <th style="width:44px;">#</th>
               <th>크리에이터</th>
-              <th style="width:120px;">레이블</th>
-              <th class="num" style="width:90px;">구독자</th>
-              <th class="num" style="width:110px;">기간 순증</th>
-              <th class="num" style="width:100px;">평균 조회율</th>
-              <th style="width:80px;">상태</th>
+              <th style="width:110px;">레이블</th>
+              <th class="num" style="width:80px;">구독자</th>
+              <th class="num" style="width:120px;">기간 순증</th>
+              <th class="num" style="width:90px;">주당 평균</th>
+              <th class="num" style="width:80px;">업로드</th>
+              <th class="num" style="width:90px;">인게이지먼트</th>
+              <th style="width:72px;">상태</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -874,6 +1067,26 @@ function renderTierRankingSection() {
     </section>
   `;
 }
+
+window._setOvPeriod = (p) => {
+  STATE.overviewPeriod = p;
+  if (p !== 'custom') STATE.overviewCustom = null;
+  renderOverview();
+};
+window._applyOvCustom = () => {
+  const from = document.getElementById('ov-from').value || null;
+  const to = document.getElementById('ov-to').value || null;
+  if (!from && !to) { alert('시작일 또는 종료일을 입력해주세요.'); return; }
+  if (from && to && from > to) { alert('시작일이 종료일보다 늦을 수 없습니다.'); return; }
+  STATE.overviewCustom = { from, to };
+  STATE.overviewPeriod = 'custom';
+  renderOverview();
+};
+window._resetOvPeriod = () => {
+  STATE.overviewPeriod = 'all';
+  STATE.overviewCustom = null;
+  renderOverview();
+};
 
 window._openMatModal = (tier, label) => {
   const { cells } = computeMatrix();
@@ -889,20 +1102,24 @@ window._openMatModal = (tier, label) => {
       <button class="mat-modal-close" onclick="window._closeMatModal()">CLOSE ✕</button>
     </div>
     <div>
-      ${sortedMembers.map(m => `
-        <div class="mat-modal-row">
+      ${sortedMembers.map(m => {
+        const clickable = m.hasData ? `onclick="window._jumpToDetail('${esc(m.name)}')" style="cursor:pointer;"` : '';
+        const hoverHint = m.hasData ? '<span style="font-family:var(--mono);font-size:9px;color:var(--accent);margin-left:6px;letter-spacing:0.1em;">→ 상세</span>' : '';
+        return `
+        <div class="mat-modal-row" ${clickable}>
           <div>
-            <div class="name">${esc(m.name)}</div>
+            <div class="name">${esc(m.name)}${hoverHint}</div>
             <div style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);margin-top:2px;">스코어 ${m.score.toFixed(1)}</div>
           </div>
           <div class="sub">${m.subs > 0 ? fmt.subsMan(m.subs) : '—'}</div>
           <div class="rev">${fmt.rev(m.revenue)}</div>
           <div><span class="badge ${m.hasData ? 'data' : 'wait'}">${m.hasData ? 'DATA' : '대기'}</span></div>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>
     <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10px;color:var(--ink-mute);display:flex;justify-content:space-between;">
       <span>좌→우: 이름·스코어 · 구독자 · 2025 매출 · 데이터 상태</span>
-      <span>스코어 내림차순</span>
+      <span>DATA 표시된 행 클릭 → 상세 이동</span>
     </div>
   `;
   document.getElementById('mat-modal-inner').innerHTML = html;
@@ -911,6 +1128,22 @@ window._openMatModal = (tier, label) => {
 
 window._closeMatModal = () => { document.getElementById('mat-modal').classList.remove('show'); };
 window._setTier = (t) => { STATE.tierFilter = t; renderOverview(); };
+
+// 매트릭스 셀(1명) 또는 모달 멤버 이름 클릭 → 상세 뷰로 점프
+window._jumpToDetail = (name) => {
+  const idx = DATA.masters.findIndex(m => {
+    const mname = m.name_ko || '';
+    return mname === name || mname.includes(name) || name.includes(mname);
+  });
+  if (idx === -1) {
+    alert(`"${name}" 채널 데이터가 아직 시트에 없습니다.\n해당 채널의 weekly_metrics가 입력되면 상세 뷰로 이동할 수 있습니다.`);
+    return;
+  }
+  STATE.creatorIdx = idx;
+  window._closeMatModal();
+  setView('detail');
+  renderCreatorTabs();
+};
 
 // ==============================================
 // 뷰 전환
@@ -963,7 +1196,7 @@ function renderDash() {
     return;
   }
   const pent = computePentagon(creator, weekly);
-  const periodLabel = { all: '전체 기간', last4: '최근 4주', last8: '최근 8주', last12: '최근 12주' }[STATE.period];
+  const periodLabel = getPeriodLabel(STATE.period, STATE.periodCustom);
   const periodRange = weekly.length > 0 ? `${weekly[0].week_label} ~ ${weekly[weekly.length-1].week_label}` : '';
   document.getElementById('footer-meta').textContent = `${periodLabel} · ${weekly.length}주 · ${videos.length}개 영상`;
   dash.innerHTML = `
@@ -973,7 +1206,7 @@ function renderDash() {
     ${renderSubscriberFlow(weekly, periodLabel, periodRange)}
     ${renderWeeklyTrends(weekly, periodLabel, videos)}
     ${renderFormatSplit(weekly, videos)}
-    ${renderVideoRanking(videos, periodLabel)}
+    ${renderVideoRanking(allVideos, allWeekly)}
   `;
   setTimeout(() => {
     buildSubChart(weekly); buildFlowChart(weekly); buildViewsChart(weekly); buildUploadsChart(weekly);
@@ -1059,9 +1292,60 @@ function renderFormatSplit(weekly, videos) {
 }
 
 let bwTab = 'views';
-function renderVideoRanking(videos, periodLabel) {
+function renderVideoRanking(allVideos, allWeekly) {
+  // §04 자체 기간으로 필터링
+  const rp = STATE.rankPeriod;
+  let videos;
+  if (rp === 'all') videos = allVideos;
+  else if (rp === 'custom' && STATE.rankCustom) {
+    videos = filterVideosByDateRange(allVideos, STATE.rankCustom.from, STATE.rankCustom.to);
+  } else {
+    const n = rp === 'last4' ? 4 : rp === 'last8' ? 8 : rp === 'last12' ? 12 : null;
+    if (n && allWeekly.length > 0) {
+      const recent = allWeekly.slice(-n);
+      const validWeeks = new Set(recent.map(w => w.week_label));
+      videos = allVideos.filter(v => validWeeks.has(v.week_label));
+    } else videos = allVideos;
+  }
+
+  const periodLabel = getPeriodLabel(rp, STATE.rankCustom);
+  const dataRange = getDataRange(allWeekly);
   const valid = videos.filter(v => v.views > 0);
-  if (valid.length === 0) return `<section class="section"><div class="sec-head"><span class="sec-num">§ 04</span><span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span><span class="sec-sub">${periodLabel}</span></div><div class="empty">해당 기간에 영상 데이터가 없습니다.</div></section>`;
+
+  // 기간 탭 + 사용자지정 UI
+  const periodTabs = ['all', 'last4', 'last8', 'last12', 'custom'].map(p => {
+    const lbl = { all: '전체', last4: '최근 4주', last8: '8주', last12: '12주', custom: '사용자지정' }[p];
+    const active = STATE.rankPeriod === p ? 'active' : '';
+    return `<button class="${active}" onclick="window._setRankPeriod('${p}')">${lbl}</button>`;
+  }).join('');
+
+  const customUI = STATE.rankPeriod === 'custom' ? `
+    <div class="date-range" style="margin-left:14px;">
+      <input type="date" id="rank-from" value="${STATE.rankCustom?.from || (dataRange?.min || '')}" />
+      <span class="sep">~</span>
+      <input type="date" id="rank-to" value="${STATE.rankCustom?.to || (dataRange?.max || '')}" />
+      <button class="apply-btn" onclick="window._applyRankCustom()">적용</button>
+      <button class="reset-btn" onclick="window._resetRankPeriod()">초기화</button>
+      ${dataRange ? `<span class="date-range-hint">데이터 범위: ${dataRange.min} ~ ${dataRange.max}</span>` : ''}
+    </div>` : '';
+
+  const headBlock = `
+    <div class="sec-head">
+      <span class="sec-num">§ 04</span>
+      <span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span>
+      <span class="sec-sub">${periodLabel} · ${valid.length}개 영상</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap;">
+      <span class="ctrl-label">기간 (§04 전용)</span>
+      <div class="ctrl-segment">${periodTabs}</div>
+      ${customUI}
+    </div>
+  `;
+
+  if (valid.length === 0) {
+    return `<section class="section">${headBlock}<div class="empty">해당 기간에 영상 데이터가 없습니다.</div></section>`;
+  }
+
   const metricLabel = { views: '조회수', engagement: '인게이지먼트율', likes: '좋아요' }[bwTab];
   const getVal = (v) => bwTab === 'views' ? v.views : bwTab === 'engagement' ? (v.views > 0 ? ((v.likes + v.comments + v.shares) / v.views * 100) : 0) : bwTab === 'likes' ? v.likes : 0;
   const sorted = [...valid].sort((a, b) => getVal(b) - getVal(a));
@@ -1072,10 +1356,29 @@ function renderVideoRanking(videos, periodLabel) {
     const tag = v.video_type === 'long' ? '▶ 롱폼' : '⏵ 숏폼';
     return `<tr><td style="width:24px;color:var(--ink-mute);font-family:var(--mono);font-size:10px;">${i+1}</td><td class="tag ${cls}">${tag}</td><td class="title" title="${esc(v.title)}">${esc(v.title)}</td><td style="font-family:var(--mono);font-size:10px;color:var(--ink-mute);width:80px;">${esc(v.week_label)}</td><td class="num" style="width:80px;">${fmtVal(v)}</td></tr>`;
   };
-  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 04</span><span class="sec-title">영상 <em>퍼포먼스 랭킹</em></span><span class="sec-sub">${periodLabel} · ${valid.length}개 영상</span></div><div class="bw-tabs"><button class="bw-tab ${bwTab === 'views' ? 'active' : ''}" onclick="window._setBW('views')">조회수</button><button class="bw-tab ${bwTab === 'engagement' ? 'active' : ''}" onclick="window._setBW('engagement')">인게이지먼트율</button><button class="bw-tab ${bwTab === 'likes' ? 'active' : ''}" onclick="window._setBW('likes')">좋아요</button></div><div class="bw-grid-split"><div class="bw-col best"><h4>▲ TOP 10 · ${metricLabel}</h4><div class="tbl-scroll"><table class="tbl"><thead><tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr></thead><tbody>${top.map((v, i) => renderRow(v, i)).join('')}</tbody></table></div></div><div class="bw-col worst"><h4>▼ BOTTOM 10 · ${metricLabel}</h4><div class="tbl-scroll"><table class="tbl"><thead><tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr></thead><tbody>${bottom.map((v, i) => renderRow(v, valid.length - bottom.length + i)).join('')}</tbody></table></div></div></div></section>`;
+  return `<section class="section">${headBlock}<div class="bw-tabs"><button class="bw-tab ${bwTab === 'views' ? 'active' : ''}" onclick="window._setBW('views')">조회수</button><button class="bw-tab ${bwTab === 'engagement' ? 'active' : ''}" onclick="window._setBW('engagement')">인게이지먼트율</button><button class="bw-tab ${bwTab === 'likes' ? 'active' : ''}" onclick="window._setBW('likes')">좋아요</button></div><div class="bw-grid-split"><div class="bw-col best"><h4>▲ TOP 10 · ${metricLabel}</h4><div class="tbl-scroll"><table class="tbl"><thead><tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr></thead><tbody>${top.map((v, i) => renderRow(v, i)).join('')}</tbody></table></div></div><div class="bw-col worst"><h4>▼ BOTTOM 10 · ${metricLabel}</h4><div class="tbl-scroll"><table class="tbl"><thead><tr><th>#</th><th>유형</th><th>제목</th><th>주차</th><th class="num">${metricLabel}</th></tr></thead><tbody>${bottom.map((v, i) => renderRow(v, valid.length - bottom.length + i)).join('')}</tbody></table></div></div></div></section>`;
 }
 
 window._setBW = (m) => { bwTab = m; renderDash(); };
+window._setRankPeriod = (p) => {
+  STATE.rankPeriod = p;
+  if (p !== 'custom') STATE.rankCustom = null;
+  renderDash();
+};
+window._applyRankCustom = () => {
+  const from = document.getElementById('rank-from').value || null;
+  const to = document.getElementById('rank-to').value || null;
+  if (!from && !to) { alert('시작일 또는 종료일을 입력해주세요.'); return; }
+  if (from && to && from > to) { alert('시작일이 종료일보다 늦을 수 없습니다.'); return; }
+  STATE.rankCustom = { from, to };
+  STATE.rankPeriod = 'custom';
+  renderDash();
+};
+window._resetRankPeriod = () => {
+  STATE.rankPeriod = 'all';
+  STATE.rankCustom = null;
+  renderDash();
+};
 
 // ==============================================
 // CHARTS
@@ -1206,9 +1509,50 @@ document.querySelectorAll('#period-tabs button').forEach(btn => {
   btn.onclick = () => {
     STATE.period = btn.dataset.period;
     document.querySelectorAll('#period-tabs button').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active'); renderDash();
+    btn.classList.add('active');
+    const customRange = document.getElementById('period-custom-range');
+    if (STATE.period === 'custom') {
+      customRange.style.display = '';
+      // 데이터 범위 표시
+      const creator = getCreator();
+      if (creator) {
+        const allWeekly = getCreatorWeekly(creator);
+        const range = getDataRange(allWeekly);
+        if (range) {
+          document.getElementById('period-range-hint').textContent = `데이터 범위: ${range.min} ~ ${range.max}`;
+          // 초기 값을 비워두고 placeholder 역할만
+          const fromInp = document.getElementById('period-from');
+          const toInp = document.getElementById('period-to');
+          if (!fromInp.value) fromInp.value = range.min;
+          if (!toInp.value) toInp.value = range.max;
+        }
+      }
+    } else {
+      customRange.style.display = 'none';
+      STATE.periodCustom = null;
+      renderDash();
+    }
   };
 });
+document.getElementById('period-apply').onclick = () => {
+  const from = document.getElementById('period-from').value || null;
+  const to = document.getElementById('period-to').value || null;
+  if (!from && !to) { alert('시작일 또는 종료일을 입력해주세요.'); return; }
+  if (from && to && from > to) { alert('시작일이 종료일보다 늦을 수 없습니다.'); return; }
+  STATE.periodCustom = { from, to };
+  STATE.period = 'custom';
+  renderDash();
+};
+document.getElementById('period-reset').onclick = () => {
+  document.getElementById('period-from').value = '';
+  document.getElementById('period-to').value = '';
+  STATE.periodCustom = null;
+  STATE.period = 'all';
+  document.querySelectorAll('#period-tabs button').forEach(b => b.classList.remove('active'));
+  document.querySelector('#period-tabs button[data-period="all"]').classList.add('active');
+  document.getElementById('period-custom-range').style.display = 'none';
+  renderDash();
+};
 document.getElementById('mat-modal').onclick = (e) => { if (e.target.id === 'mat-modal') window._closeMatModal(); };
 
 // ==============================================
