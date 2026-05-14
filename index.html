@@ -90,11 +90,19 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 .health-badge.watch .bdot { background: var(--amber); }
 .health-badge.high .bdot { background: var(--red); animation: pulse 1.5s infinite; }
 
-.pentagon-row { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); }
-.pent-cell { padding: 22px 26px; border-right: 1px solid var(--line); }
+/* v15: 5각 레이더 + 5축 패널 하이브리드 레이아웃 */
+.pentagon-block { display: grid; grid-template-columns: minmax(340px, 0.6fr) 1.4fr; border-bottom: 1px solid var(--line); }
+.pentagon-radar-wrap { padding: 24px 28px; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: stretch; background: var(--bg-soft); }
+.pentagon-radar-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; margin-bottom: 6px; }
+.pentagon-radar-canvas { flex: 1; min-height: 280px; position: relative; }
+.pentagon-radar-canvas canvas { width: 100% !important; height: 100% !important; }
+.pentagon-radar-note { font-family: var(--mono); font-size: 9px; color: var(--ink-mute); letter-spacing: 0.05em; margin-top: 6px; text-align: center; }
+.pentagon-axes { display: grid; grid-template-columns: repeat(5, 1fr); }
+.pent-cell { padding: 22px 22px; border-right: 1px solid var(--line); }
 .pent-cell:last-child { border-right: none; }
 .pent-name { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
 .pent-score { font-family: var(--serif); font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
+.pent-score-max { font-size: 14px; color: var(--ink-mute); font-family: var(--mono); font-weight: 400; }
 .pent-score.good { color: var(--green); } .pent-score.mid { color: var(--amber); } .pent-score.low { color: var(--red); }
 .pent-bar { margin-top: 10px; height: 3px; background: var(--bg-card); overflow: hidden; }
 .pent-bar-fill { height: 100%; transition: width 0.6s ease; }
@@ -243,7 +251,13 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 .mat-modal-row .badge.wait { color: var(--ink-mute); border-color: var(--line); background: var(--bg-soft); }
 
 @media (max-width: 1024px) {
-  .pentagon-row { grid-template-columns: repeat(2, 1fr); }
+  .pentagon-block { grid-template-columns: 1fr; }
+  .pentagon-radar-wrap { border-right: none; border-bottom: 1px solid var(--line); }
+  .pentagon-radar-canvas { min-height: 320px; }
+  .pentagon-axes { grid-template-columns: repeat(2, 1fr); }
+  .pent-cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .pent-cell:nth-child(2n) { border-right: none; }
+  .pent-cell:last-child { border-bottom: none; }
   .subkpi-grid { grid-template-columns: repeat(2, 1fr); }
   .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
   .flow-grid, .fmt-grid { grid-template-columns: 1fr; }
@@ -697,53 +711,145 @@ function filterVideosByPeriodWeeks(videos, periodWeeks) {
 }
 
 // ==============================================
-// 5축 점수 계산 (Phase A 포함)
+// v15 신규: 5축 점수 계산 (분위수 기반)
+// 산식 정책: B(최근 12주 분포 기준) + b(p75=100점) + 축1 가중 70:30
+// ----------------------------------------------
+// percentileScore(value, p25, p75):
+//   value >= p75               → 100점
+//   p25 ≤ value < p75          → 50 + (value-p25)/(p75-p25) * 50  [선형]
+//   0 ≤ value < p25            → (value/p25) * 50                 [선형]
+//   value < 0                  → 0점
 // ==============================================
+function percentileScore(value, p25, p75) {
+  if (!isFinite(value)) return 0;
+  if (p75 <= p25) {
+    // 임계값 동일 시 단순 cap
+    return value >= p75 ? 100 : (value >= 0 ? (value / p75) * 100 : 0);
+  }
+  if (value >= p75) return 100;
+  if (value >= p25) return 50 + (value - p25) / (p75 - p25) * 50;
+  if (value >= 0)   return p25 > 0 ? (value / p25) * 50 : 0;
+  return 0;
+}
+
+// 분위수 헬퍼 (선형 보간, pandas/Sheet PERCENTILE 호환)
+function quantile(sortedArr, q) {
+  if (!sortedArr.length) return 0;
+  if (sortedArr.length === 1) return sortedArr[0];
+  const pos = (sortedArr.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  if (base + 1 < sortedArr.length) {
+    return sortedArr[base] + rest * (sortedArr[base + 1] - sortedArr[base]);
+  }
+  return sortedArr[base];
+}
+
+// 최근 N주 기준 임계값 계산
+// 데이터가 12주 미만이면 전체 사용, 그 이상이면 마지막 12주
+function getThresholds(weekly) {
+  const N = 12;
+  const base = weekly.length >= N ? weekly.slice(-N) : weekly;
+  const sortAsc = (a, b) => a - b;
+  const pull = (fn) => base.map(fn).filter(v => isFinite(v)).sort(sortAsc);
+
+  const sub_net   = pull(w => w.sub_net);
+  const retention = pull(w => w.sub_gained > 0 ? (w.sub_gained - (w.sub_lost || 0)) / w.sub_gained * 100 : 0);
+  const uploads   = pull(w => w.uploads_total);
+  const vp        = pull(w => w.avg_view_pct).filter(v => v > 0);
+  const eng       = pull(w => w.views > 0 ? (((w.likes||0) + w.comments + w.shares) / w.views) * 100 : 0);
+  const rv        = pull(w => w.returning_viewer_pct).filter(v => v > 0);
+
+  return {
+    sub_net:   { p25: quantile(sub_net, 0.25),   p75: quantile(sub_net, 0.75) },
+    retention: { p25: quantile(retention, 0.25), p75: quantile(retention, 0.75) },
+    uploads:   { p25: quantile(uploads, 0.25),   p75: quantile(uploads, 0.75) },
+    vp:        { p25: quantile(vp, 0.25),        p75: quantile(vp, 0.75) },
+    eng:       { p25: quantile(eng, 0.25),       p75: quantile(eng, 0.75) },
+    rv:        { p25: quantile(rv, 0.25),        p75: quantile(rv, 0.75) },
+    baseWeeks: base.length
+  };
+}
+
 function computePentagon(creator, weekly) {
-  if (weekly.length === 0) return { scores: [0,0,0,0,0], overall: 0, grade: 'none', raw: {} };
-  const subsBase = num(creator.subscribers_baseline);
+  if (weekly.length === 0) return { scores: [0,0,0,0,0], overall: 0, grade: 'none', raw: {}, thresholds: null };
+
+  const TH = getThresholds(weekly);
+
+  // 표시기간(weekly 전체) 평균 raw 값
   const totalNet = weekly.reduce((s, w) => s + w.sub_net, 0);
-  const growthRate = subsBase > 0 ? (totalNet / subsBase) * 100 : 0;
-  const growthScore = Math.max(0, Math.min(100, 50 + growthRate * 100));
+  const avgSubNet = totalNet / weekly.length;
+
+  const retArr = weekly.map(w => w.sub_gained > 0 ? (w.sub_gained - (w.sub_lost || 0)) / w.sub_gained * 100 : 0);
+  const avgRetention = retArr.reduce((s,x) => s+x, 0) / retArr.length;
+
   const totalUploads = weekly.reduce((s, w) => s + w.uploads_total, 0);
-  const avgPerWeek = totalUploads / weekly.length;
+  const avgUploads = totalUploads / weekly.length;
   const emptyWeeks = weekly.filter(w => w.uploads_total === 0).length;
-  let supplyScore = Math.min(100, (avgPerWeek / 3) * 100);
-  supplyScore = Math.max(0, supplyScore - emptyWeeks * 5);
+
   const validVP = weekly.filter(w => w.avg_view_pct > 0);
   const avgVP = validVP.length > 0 ? validVP.reduce((s, w) => s + w.avg_view_pct, 0) / validVP.length : 0;
-  const effScore = Math.max(0, Math.min(100, (avgVP / 40) * 100));
+
   const validER = weekly.filter(w => w.views > 0);
-  const totalEng = validER.reduce((s, w) => s + w.likes + w.comments + w.shares, 0);
+  const totalEng = validER.reduce((s, w) => s + (w.likes||0) + w.comments + w.shares, 0);
   const totalViews = validER.reduce((s, w) => s + w.views, 0);
   const engRate = totalViews > 0 ? (totalEng / totalViews) * 100 : 0;
-  const engScore = Math.max(0, Math.min(100, (engRate / 0.8) * 100));
+
   const validRV = weekly.filter(w => w.returning_viewer_pct > 0);
-  let loyaltyScore = 0; let loyaltyRaw = '데이터 없음'; let loyaltyReal = false;
-  if (validRV.length > 0) {
-    const avgRV = validRV.reduce((s, w) => s + w.returning_viewer_pct, 0) / validRV.length;
-    loyaltyScore = Math.max(0, Math.min(100, (avgRV / 50) * 100));
-    loyaltyRaw = avgRV.toFixed(1) + '%'; loyaltyReal = true;
+  const hasRV = validRV.length > 0;
+  const avgRV = hasRV ? validRV.reduce((s, w) => s + w.returning_viewer_pct, 0) / validRV.length : 0;
+
+  // 점수 계산
+  const s_subnet    = percentileScore(avgSubNet,    TH.sub_net.p25,   TH.sub_net.p75);
+  const s_retention = percentileScore(avgRetention, TH.retention.p25, TH.retention.p75);
+  const growthScore = s_subnet * 0.7 + s_retention * 0.3;
+
+  let supplyScore = percentileScore(avgUploads, TH.uploads.p25, TH.uploads.p75);
+  supplyScore = Math.max(0, supplyScore - emptyWeeks * 5);
+
+  const effScore = percentileScore(avgVP, TH.vp.p25, TH.vp.p75);
+  const engScore = percentileScore(engRate, TH.eng.p25, TH.eng.p75);
+
+  let loyaltyScore = 0, loyaltyRaw = '데이터 없음', loyaltyReal = false;
+  if (hasRV) {
+    loyaltyScore = percentileScore(avgRV, TH.rv.p25, TH.rv.p75);
+    loyaltyRaw = avgRV.toFixed(1) + '%';
+    loyaltyReal = true;
   } else {
     const spv = totalViews > 0 ? (totalNet / totalViews) * 100 : 0;
     loyaltyScore = Math.max(0, Math.min(60, (spv / 0.1) * 60));
     loyaltyRaw = `SPV ${spv.toFixed(3)}%`;
   }
-  const scores = [Math.round(growthScore), Math.round(supplyScore), Math.round(effScore), Math.round(engScore), Math.round(loyaltyScore)];
+
+  const scores = [
+    Math.round(growthScore),
+    Math.round(supplyScore),
+    Math.round(effScore),
+    Math.round(engScore),
+    Math.round(loyaltyScore)
+  ];
   const overall = Math.round(scores.reduce((s,x) => s+x, 0) / 5);
+
   let grade;
   if (overall >= 70) grade = 'healthy';
   else if (overall >= 50) grade = 'watch';
   else grade = 'high';
+
   return {
     scores, overall, grade,
     raw: {
-      growth: { rate: growthRate, total: totalNet, weeks: weekly.length },
-      supply: { perWeek: avgPerWeek, total: totalUploads, empty: emptyWeeks },
+      growth: {
+        rate: 0, total: totalNet, weeks: weekly.length,
+        avgSubNet, avgRetention,
+        subnetScore: Math.round(s_subnet),
+        retentionScore: Math.round(s_retention)
+      },
+      supply: { perWeek: avgUploads, total: totalUploads, empty: emptyWeeks },
       efficiency: { avgVP },
       engagement: { rate: engRate, total: totalEng, views: totalViews },
-      loyalty: { raw: loyaltyRaw, real: loyaltyReal }
-    }
+      loyalty: { raw: loyaltyRaw, real: loyaltyReal, avgRV }
+    },
+    thresholds: TH
   };
 }
 
@@ -1240,6 +1346,7 @@ function renderDash() {
     ${renderVideoRanking(allVideos, allWeekly)}
   `;
   setTimeout(() => {
+    buildRadarChart(pent);
     buildSubChart(weekly); buildFlowChart(weekly); buildViewsChart(weekly); buildUploadsChart(weekly);
     buildVPChart(weekly, videos); buildEngagementChart(weekly, videos);
     buildFormatViewsChart(weekly); buildFormatUploadsChart(weekly);
@@ -1256,17 +1363,27 @@ function renderHero(creator, weekly, pent) {
 
 function renderPentagon(pent) {
   const labels = ['구독 성장', '콘텐츠 공급', '콘텐츠 효율', '인게이지먼트', '충성도'];
+  const g = pent.raw.growth, s = pent.raw.supply, e = pent.raw.efficiency, n = pent.raw.engagement, l = pent.raw.loyalty;
   const subs = [
-    `${pent.raw.growth.rate >= 0 ? '+' : ''}${pent.raw.growth.rate.toFixed(2)}% · ${fmt.signed(pent.raw.growth.total)}명`,
-    `${pent.raw.supply.perWeek.toFixed(1)}건/주 · 공백 ${pent.raw.supply.empty}주`,
-    `평균 ${pent.raw.efficiency.avgVP.toFixed(1)}%`,
-    `${pent.raw.engagement.rate.toFixed(2)}% · ${fmt.numK(pent.raw.engagement.total)}건`,
-    pent.raw.loyalty.real ? `재방문 ${pent.raw.loyalty.raw}` : `프록시 · ${pent.raw.loyalty.raw}`,
+    `${fmt.signed(Math.round(g.avgSubNet))}/주 · 유지율 ${g.avgRetention.toFixed(1)}%`,
+    `${s.perWeek.toFixed(1)}건/주 · 공백 ${s.empty}주`,
+    `평균 ${e.avgVP.toFixed(1)}%`,
+    `${n.rate.toFixed(2)}% · ${fmt.numK(n.total)}건`,
+    l.real ? `재방문 ${l.raw}` : `프록시 · ${l.raw}`,
   ];
-  return `<section class="pentagon-row">${pent.scores.map((s, i) => {
-    const cls = s >= 70 ? 'good' : s >= 50 ? 'mid' : 'low';
-    return `<div class="pent-cell"><div class="pent-name">${labels[i]}</div><div class="pent-score ${cls}">${s}<span style="font-size:14px;color:var(--ink-mute);font-family:var(--mono);font-weight:400;"> / 100</span></div><div class="pent-bar"><div class="pent-bar-fill ${cls}" style="width:${s}%"></div></div><div class="pent-sub">${subs[i]}</div></div>`;
-  }).join('')}</section>`;
+  return `<section class="pentagon-block">
+    <div class="pentagon-radar-wrap">
+      <div class="pentagon-radar-title">5축 균형</div>
+      <div class="pentagon-radar-canvas"><canvas id="ch-radar"></canvas></div>
+      <div class="pentagon-radar-note">최근 ${pent.thresholds ? pent.thresholds.baseWeeks : 12}주 분포 기준 · p75=100점</div>
+    </div>
+    <div class="pentagon-axes">
+      ${pent.scores.map((sc, i) => {
+        const cls = sc >= 70 ? 'good' : sc >= 50 ? 'mid' : 'low';
+        return `<div class="pent-cell"><div class="pent-name">${labels[i]}</div><div class="pent-score ${cls}">${sc}<span class="pent-score-max"> / 100</span></div><div class="pent-bar"><div class="pent-bar-fill ${cls}" style="width:${sc}%"></div></div><div class="pent-sub">${subs[i]}</div></div>`;
+      }).join('')}
+    </div>
+  </section>`;
 }
 
 function renderDiagnosis(pent, creator) {
@@ -1419,6 +1536,86 @@ Chart.defaults.borderColor = '#e5e1d8';
 Chart.defaults.font.family = 'JetBrains Mono, monospace';
 Chart.defaults.font.size = 10;
 function ma4(arr) { return arr.map((_, i) => { const slice = arr.slice(Math.max(0, i-3), i+1); return slice.reduce((s, x) => s + x, 0) / slice.length; }); }
+
+function buildRadarChart(pent) {
+  const ctx = document.getElementById('ch-radar'); if (!ctx) return;
+  const labels = ['구독 성장', '콘텐츠 공급', '콘텐츠 효율', '인게이지먼트', '충성도'];
+  const scores = pent.scores;
+  // 등급에 따라 라인 컬러 결정
+  const gradeColor = pent.grade === 'healthy' ? '#15803d' : pent.grade === 'watch' ? '#d97706' : '#b91c1c';
+  const gradeFill  = pent.grade === 'healthy' ? 'rgba(21,128,61,0.18)' : pent.grade === 'watch' ? 'rgba(217,119,6,0.18)' : 'rgba(185,28,28,0.18)';
+  // 기준선 (70점) - 점선 표시용
+  const benchmark = [70, 70, 70, 70, 70];
+
+  charts.radar = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: '현재 점수',
+          data: scores,
+          backgroundColor: gradeFill,
+          borderColor: gradeColor,
+          borderWidth: 2,
+          pointBackgroundColor: gradeColor,
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: gradeColor,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          order: 1
+        },
+        {
+          label: '안전 기준 (70)',
+          data: benchmark,
+          backgroundColor: 'transparent',
+          borderColor: 'rgba(154, 150, 138, 0.5)',
+          borderWidth: 1,
+          borderDash: [4, 4],
+          pointRadius: 0,
+          fill: false,
+          order: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(26, 24, 21, 0.92)',
+          titleFont: { family: 'Pretendard', size: 11, weight: 600 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          padding: 10,
+          callbacks: {
+            label: (c) => c.dataset.label + ': ' + c.raw + (c.datasetIndex === 0 ? ' / 100' : '')
+          }
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: {
+            stepSize: 25,
+            font: { family: 'JetBrains Mono', size: 9 },
+            color: '#9c968a',
+            backdropColor: 'transparent',
+            showLabelBackdrop: false
+          },
+          pointLabels: {
+            font: { family: 'Pretendard', size: 11, weight: 500 },
+            color: '#1a1815'
+          },
+          grid: { color: 'rgba(229, 225, 216, 0.8)' },
+          angleLines: { color: 'rgba(229, 225, 216, 0.8)' }
+        }
+      }
+    }
+  });
+}
 
 function buildSubChart(weekly) {
   const ctx = document.getElementById('ch-sub'); if (!ctx) return;
