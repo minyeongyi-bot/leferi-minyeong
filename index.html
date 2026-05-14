@@ -176,6 +176,33 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 .bw-col h4 { font-family: var(--serif); font-size: 16px; font-style: italic; font-weight: 600; margin-bottom: 12px; }
 .bw-col.best h4 { color: var(--green); } .bw-col.worst h4 { color: var(--red); }
 
+/* v15.1: 오디언스 인구통계 블록 */
+.demo-block { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--line); }
+.demo-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+.demo-eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.demo-snapshot { font-family: var(--mono); font-size: 10px; color: var(--ink-mute); letter-spacing: 0.05em; margin-left: auto; }
+.demo-empty-msg { padding: 20px; background: var(--bg-soft); border: 1px dashed var(--line); font-family: var(--mono); font-size: 11px; color: var(--ink-mute); }
+.demo-empty-msg code { font-family: var(--mono); background: var(--bg-card); padding: 2px 6px; color: var(--ink); }
+.demo-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 28px; }
+.demo-chart-wrap { background: var(--bg-soft); border: 1px solid var(--line); padding: 20px 24px; }
+.demo-chart-title { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 14px; font-weight: 600; }
+.demo-chart-canvas { height: 280px; position: relative; }
+.demo-chart-canvas canvas { width: 100% !important; height: 100% !important; }
+.demo-chart-legend { display: flex; gap: 20px; margin-top: 12px; font-family: var(--mono); font-size: 10px; color: var(--ink-soft); letter-spacing: 0.04em; }
+.demo-kpi-wrap { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.demo-kpi { background: var(--bg); padding: 18px 22px; }
+.demo-kpi-name { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
+.demo-kpi-val { font-family: var(--serif); font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; }
+.demo-kpi-sep { color: var(--ink-mute); font-weight: 400; margin: 0 4px; }
+.demo-kpi-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-soft); margin-top: 6px; letter-spacing: 0.02em; }
+.demo-pink { color: var(--pink); }
+.demo-blue { color: var(--blue); }
+@media (max-width: 1024px) {
+  .demo-grid { grid-template-columns: 1fr; }
+  .demo-chart-canvas { height: 320px; }
+}
+
+
 .foot { padding: 32px 48px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--ink-mute); display: flex; justify-content: space-between; text-transform: uppercase; }
 .empty { padding: 48px; text-align: center; color: var(--ink-mute); font-size: 13px; background: var(--bg-soft); border: 1px dashed var(--line); }
 .warn-banner { background: var(--amber-bg); border: 1px solid var(--amber); border-left: 3px solid var(--amber); padding: 10px 14px; margin-bottom: 18px; font-size: 12px; color: #78350f; font-family: var(--mono); letter-spacing: 0.02em; }
@@ -352,7 +379,8 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 const SHEET_URLS = {
   creators_master: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIP5FW1AH-o7gHSrDBU7NgYL1U-uySjqivg3XXPBE19NsjMZEh170Rj1y8pMTd8rrHdULW4tG-YPm3/pub?gid=2061700318&single=true&output=csv',
   weekly_metrics:  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIP5FW1AH-o7gHSrDBU7NgYL1U-uySjqivg3XXPBE19NsjMZEh170Rj1y8pMTd8rrHdULW4tG-YPm3/pub?gid=2031962060&single=true&output=csv',
-  videos:          'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIP5FW1AH-o7gHSrDBU7NgYL1U-uySjqivg3XXPBE19NsjMZEh170Rj1y8pMTd8rrHdULW4tG-YPm3/pub?gid=437127923&single=true&output=csv'
+  videos:          'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIP5FW1AH-o7gHSrDBU7NgYL1U-uySjqivg3XXPBE19NsjMZEh170Rj1y8pMTd8rrHdULW4tG-YPm3/pub?gid=437127923&single=true&output=csv',
+  audience_demographics: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSIP5FW1AH-o7gHSrDBU7NgYL1U-uySjqivg3XXPBE19NsjMZEh170Rj1y8pMTd8rrHdULW4tG-YPm3/pub?gid=0&single=true&output=csv'
 };
 
 // ==============================================
@@ -592,7 +620,26 @@ async function loadData() {
   DATA.masters = csvToObjects(m).filter(r => !r.active || r.active.toLowerCase() !== 'false');
   DATA.weekly = csvToObjects(w);
   DATA.videos = csvToObjects(v);
-  console.log('[Loaded]', { masters: DATA.masters.length, weekly: DATA.weekly.length, videos: DATA.videos.length });
+
+  // v15.1: 오디언스 인구통계 (옵셔널, 실패해도 무관)
+  DATA.demographics = [];
+  try {
+    const d = await fetchCSV(SHEET_URLS.audience_demographics, 'audience_demographics');
+    const parsed = csvToObjects(d);
+    // 검증: 필수 컬럼이 있는지 확인 (audience_demographics 탭인지 판별)
+    const hasRequired = parsed.length > 0 && parsed[0].hasOwnProperty('age_group') && parsed[0].hasOwnProperty('gender') && parsed[0].hasOwnProperty('viewer_pct');
+    if (hasRequired) {
+      DATA.demographics = parsed;
+      console.log('[Loaded] demographics:', DATA.demographics.length, '행');
+    } else {
+      console.warn('[Skip] audience_demographics gid 잘못된 탭. 필수 컬럼(age_group/gender/viewer_pct) 누락');
+      console.warn('       응답된 컬럼:', parsed.length > 0 ? Object.keys(parsed[0]) : '(빈 데이터)');
+    }
+  } catch (e) {
+    console.warn('[Skip] audience_demographics fetch 실패:', e);
+  }
+
+  console.log('[Loaded]', { masters: DATA.masters.length, weekly: DATA.weekly.length, videos: DATA.videos.length, demographics: DATA.demographics.length });
 }
 
 // ==============================================
@@ -647,6 +694,66 @@ function getCreatorVideos(creator) {
     avg_view_pct: num(v.avg_view_pct),
     h3_category: v['3h_category'] || '', biz_org: v.biz_org || '',
   })).sort((a, b) => (b.published_at || '').localeCompare(a.published_at || ''));
+}
+
+// v15.1: 오디언스 인구통계 가공
+// 가장 최신 snapshot_date의 데이터만 반환
+function getCreatorDemographics(creator) {
+  if (!DATA.demographics || DATA.demographics.length === 0) return null;
+  const cid = creator.creator_id;
+  const rows = DATA.demographics.filter(d => d.creator_id === cid && num(d.viewer_pct) > 0);
+  if (rows.length === 0) return null;
+
+  // 가장 최신 snapshot_date 찾기
+  const dates = [...new Set(rows.map(r => r.snapshot_date))].sort();
+  const latestDate = dates[dates.length - 1];
+  const latest = rows.filter(r => r.snapshot_date === latestDate);
+
+  // age_group × gender 매트릭스 + 합계 계산
+  const ageOrder = ['age13-17', 'age18-24', 'age25-34', 'age35-44', 'age45-54', 'age55-64', 'age65-'];
+  const ageLabels = ['13-17', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'];
+
+  const byAgeGender = {};  // {age: {female, male, ...}}
+  latest.forEach(r => {
+    const age = r.age_group;
+    const gen = r.gender;
+    if (!byAgeGender[age]) byAgeGender[age] = {};
+    byAgeGender[age][gen] = num(r.viewer_pct);
+  });
+
+  // 정렬된 배열로 변환
+  const ageData = ageOrder.map((age, i) => ({
+    age, label: ageLabels[i],
+    female: byAgeGender[age]?.female || 0,
+    male: byAgeGender[age]?.male || 0,
+    other: (byAgeGender[age]?.user_specified || 0) + (byAgeGender[age]?.gender_other || 0),
+    total: (byAgeGender[age]?.female || 0) + (byAgeGender[age]?.male || 0) + (byAgeGender[age]?.user_specified || 0) + (byAgeGender[age]?.gender_other || 0),
+  }));
+
+  // 성별 합계
+  const totalFemale = ageData.reduce((s, a) => s + a.female, 0);
+  const totalMale = ageData.reduce((s, a) => s + a.male, 0);
+  const totalOther = ageData.reduce((s, a) => s + a.other, 0);
+
+  // 최대 셀 (페르소나)
+  const allCells = [];
+  ageData.forEach(a => {
+    if (a.female > 0) allCells.push({ age: a.label, gender: 'female', pct: a.female });
+    if (a.male > 0) allCells.push({ age: a.label, gender: 'male', pct: a.male });
+  });
+  allCells.sort((x, y) => y.pct - x.pct);
+  const topPersona = allCells[0];
+
+  // 핵심 자산 (13-34 여성)
+  const coreYoung = (byAgeGender['age13-17']?.female || 0) + (byAgeGender['age18-24']?.female || 0) + (byAgeGender['age25-34']?.female || 0);
+
+  return {
+    snapshotDate: latestDate,
+    ageData, ageLabels,
+    totalFemale, totalMale, totalOther,
+    topPersona,
+    coreYoung
+  };
 }
 
 function filterByPeriod(weekly) {
@@ -1342,7 +1449,7 @@ function renderDash() {
     ${renderHero(creator, weekly, pent)}
     ${renderPentagon(pent)}
     ${renderDiagnosis(pent, creator)}
-    ${renderSubscriberFlow(weekly, periodLabel, periodRange)}
+    ${renderSubscriberFlow(weekly, periodLabel, periodRange, creator)}
     ${renderWeeklyTrends(weekly, periodLabel, videos)}
     ${renderFormatSplit(weekly, videos)}
     ${renderVideoRanking(allVideos, allWeekly)}
@@ -1352,6 +1459,8 @@ function renderDash() {
     buildSubChart(weekly); buildFlowChart(weekly); buildViewsChart(weekly); buildUploadsChart(weekly);
     buildVPChart(weekly, videos); buildEngagementChart(weekly, videos);
     buildFormatViewsChart(weekly); buildFormatUploadsChart(weekly);
+    const demo = getCreatorDemographics(creator);
+    if (demo) buildDemographicsChart(demo);
   }, 50);
 }
 
@@ -1408,13 +1517,61 @@ function renderDiagnosis(pent, creator) {
   return `<section style="padding: 0 48px 36px;"><div class="diagnosis ${pent.grade}"><span class="diag-tag">${tag}</span>${text}</div></section>`;
 }
 
-function renderSubscriberFlow(weekly, periodLabel, periodRange) {
+function renderSubscriberFlow(weekly, periodLabel, periodRange, creator) {
   const gained = weekly.reduce((s, w) => s + w.sub_gained, 0);
   const lost = weekly.reduce((s, w) => s + w.sub_lost, 0);
   const net = weekly.reduce((s, w) => s + w.sub_net, 0);
   const retainRate = gained > 0 ? ((gained - lost) / gained * 100) : 0;
   const hasFlowData = gained > 0 || lost > 0;
-  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 01</span><span class="sec-title">구독자 <em>흐름</em></span><span class="sec-sub">${periodLabel} · ${periodRange}</span></div>${!hasFlowData ? `<div class="warn-banner">ⓘ sub_gained / sub_lost 값이 0입니다. sub_net만 표시됩니다.</div>` : ''}<div class="flow-grid"><div class="flow-cell gained"><div class="flow-name">신규 구독 (Gained)</div><div class="flow-val pos">+${fmt.num(gained)}</div><div class="flow-sub">주당 평균 +${fmt.num(gained/weekly.length)}명</div></div><div class="flow-cell lost"><div class="flow-name">이탈 구독 (Lost)</div><div class="flow-val neg">−${fmt.num(lost)}</div><div class="flow-sub">주당 평균 −${fmt.num(lost/weekly.length)}명</div></div><div class="flow-cell net"><div class="flow-name">순증 (Net)</div><div class="flow-val ${net >= 0 ? 'pos' : 'neg'}">${fmt.signed(net)}</div><div class="flow-sub">${hasFlowData ? `유지율 ${retainRate.toFixed(1)}% · ` : ''}주당 평균 ${fmt.signed(net/weekly.length)}명</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 순증 추이</div><div class="chart-sub">막대 · 4주 이동평균 라인</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--blue);"></span>주간 순증</span><span><span class="lg-dot" style="background:var(--orange);"></span>4주 이동평균</span></div><div class="chart-canvas tall"><canvas id="ch-sub"></canvas></div></div><div class="chart-card"><div class="chart-title">신규 vs 이탈 흐름</div><div class="chart-sub">${hasFlowData ? '신규(양수) · 이탈(음수)' : 'sub_net만 표시'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--green);"></span>신규</span><span><span class="lg-dot" style="background:var(--red);"></span>이탈</span></div><div class="chart-canvas tall"><canvas id="ch-flow"></canvas></div></div></div></section>`;
+  const demo = creator ? getCreatorDemographics(creator) : null;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 01</span><span class="sec-title">구독자 <em>흐름</em></span><span class="sec-sub">${periodLabel} · ${periodRange}</span></div>${!hasFlowData ? `<div class="warn-banner">ⓘ sub_gained / sub_lost 값이 0입니다. sub_net만 표시됩니다.</div>` : ''}<div class="flow-grid"><div class="flow-cell gained"><div class="flow-name">신규 구독 (Gained)</div><div class="flow-val pos">+${fmt.num(gained)}</div><div class="flow-sub">주당 평균 +${fmt.num(gained/weekly.length)}명</div></div><div class="flow-cell lost"><div class="flow-name">이탈 구독 (Lost)</div><div class="flow-val neg">−${fmt.num(lost)}</div><div class="flow-sub">주당 평균 −${fmt.num(lost/weekly.length)}명</div></div><div class="flow-cell net"><div class="flow-name">순증 (Net)</div><div class="flow-val ${net >= 0 ? 'pos' : 'neg'}">${fmt.signed(net)}</div><div class="flow-sub">${hasFlowData ? `유지율 ${retainRate.toFixed(1)}% · ` : ''}주당 평균 ${fmt.signed(net/weekly.length)}명</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 순증 추이</div><div class="chart-sub">막대 · 4주 이동평균 라인</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--blue);"></span>주간 순증</span><span><span class="lg-dot" style="background:var(--orange);"></span>4주 이동평균</span></div><div class="chart-canvas tall"><canvas id="ch-sub"></canvas></div></div><div class="chart-card"><div class="chart-title">신규 vs 이탈 흐름</div><div class="chart-sub">${hasFlowData ? '신규(양수) · 이탈(음수)' : 'sub_net만 표시'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--green);"></span>신규</span><span><span class="lg-dot" style="background:var(--red);"></span>이탈</span></div><div class="chart-canvas tall"><canvas id="ch-flow"></canvas></div></div></div>${renderDemographicsBlock(demo)}</section>`;
+}
+
+// v15.1: 오디언스 인구통계 블록
+function renderDemographicsBlock(demo) {
+  if (!demo) {
+    return `<div class="demo-block demo-block-empty">
+      <div class="demo-head"><span class="demo-eyebrow">오디언스 인구통계</span></div>
+      <div class="demo-empty-msg">ⓘ 인구통계 데이터가 없습니다. Apps Script <code>fetchDemographics()</code> 실행 후 확인해주세요.</div>
+    </div>`;
+  }
+
+  // KPI 카드: 여성/남성 비중, 핵심 페르소나, 13-34 여성
+  const fmtPct = (n) => n.toFixed(1) + '%';
+
+  return `<div class="demo-block">
+    <div class="demo-head">
+      <span class="demo-eyebrow">오디언스 인구통계</span>
+      <span class="demo-snapshot">최근 90일 기준 · 스냅샷 ${demo.snapshotDate}</span>
+    </div>
+    <div class="demo-grid">
+      <div class="demo-chart-wrap">
+        <div class="demo-chart-title">연령 × 성별 분포</div>
+        <div class="demo-chart-canvas"><canvas id="ch-demo"></canvas></div>
+        <div class="demo-chart-legend">
+          <span><span class="lg-dot" style="background:var(--pink);"></span>여성</span>
+          <span><span class="lg-dot" style="background:var(--blue);"></span>남성</span>
+        </div>
+      </div>
+      <div class="demo-kpi-wrap">
+        <div class="demo-kpi">
+          <div class="demo-kpi-name">성별 비중</div>
+          <div class="demo-kpi-val"><span class="demo-pink">${fmtPct(demo.totalFemale)}</span> <span class="demo-kpi-sep">·</span> <span class="demo-blue">${fmtPct(demo.totalMale)}</span></div>
+          <div class="demo-kpi-sub">여성 · 남성</div>
+        </div>
+        <div class="demo-kpi">
+          <div class="demo-kpi-name">최대 페르소나</div>
+          <div class="demo-kpi-val demo-${demo.topPersona.gender === 'female' ? 'pink' : 'blue'}">${demo.topPersona.age} ${demo.topPersona.gender === 'female' ? '여성' : '남성'}</div>
+          <div class="demo-kpi-sub">${fmtPct(demo.topPersona.pct)} · 1위 시청자군</div>
+        </div>
+        <div class="demo-kpi">
+          <div class="demo-kpi-name">핵심 자산</div>
+          <div class="demo-kpi-val">${fmtPct(demo.coreYoung)}</div>
+          <div class="demo-kpi-sub">13-34 여성 합계 (Z세대~밀레니얼)</div>
+        </div>
+      </div>
+    </div>
+  </div>`;
 }
 
 function renderWeeklyTrends(weekly, periodLabel, videos) {
@@ -1620,6 +1777,72 @@ function buildRadarChart(pent) {
           },
           grid: { color: 'rgba(229, 225, 216, 0.8)' },
           angleLines: { color: 'rgba(229, 225, 216, 0.8)' }
+        }
+      }
+    }
+  });
+}
+
+function buildDemographicsChart(demo) {
+  const ctx = document.getElementById('ch-demo'); if (!ctx) return;
+  // Y축 위에서 아래 = 어린 연령 -> 나이 많은 순서 (피라미드 느낌)
+  // 좌(음수): 남성 / 우(양수): 여성 - 인구 피라미드 스타일
+  const ages = demo.ageData.map(a => a.label);
+  const femaleData = demo.ageData.map(a => a.female);
+  const maleData = demo.ageData.map(a => -a.male);  // 음수로 좌측 표시
+
+  charts.demo = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ages,
+      datasets: [
+        {
+          label: '여성',
+          data: femaleData,
+          backgroundColor: 'rgba(212,83,126,0.85)',
+          borderColor: '#D4537E',
+          borderWidth: 1,
+          stack: 'gender',
+        },
+        {
+          label: '남성',
+          data: maleData,
+          backgroundColor: 'rgba(24,95,165,0.75)',
+          borderColor: '#185FA5',
+          borderWidth: 1,
+          stack: 'gender',
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(26, 24, 21, 0.92)',
+          titleFont: { family: 'Pretendard', size: 11, weight: 600 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
+          padding: 10,
+          callbacks: {
+            label: (c) => c.dataset.label + ': ' + Math.abs(c.raw).toFixed(1) + '%'
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: {
+            callback: v => Math.abs(v) + '%',
+            font: { family: 'JetBrains Mono', size: 10 }
+          },
+          grid: { color: 'rgba(229,225,216,0.6)' }
+        },
+        y: {
+          stacked: true,
+          ticks: { font: { family: 'JetBrains Mono', size: 11 } },
+          grid: { display: false }
         }
       }
     }
