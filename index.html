@@ -90,24 +90,27 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 .health-badge.watch .bdot { background: var(--amber); }
 .health-badge.high .bdot { background: var(--red); animation: pulse 1.5s infinite; }
 
-/* v15: 5각 레이더 + 5축 패널 하이브리드 레이아웃 */
-.pentagon-block { display: grid; grid-template-columns: minmax(340px, 0.6fr) 1.4fr; border-bottom: 1px solid var(--line); }
-.pentagon-radar-wrap { padding: 24px 28px; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: stretch; background: var(--bg-soft); }
-.pentagon-radar-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; margin-bottom: 6px; }
-.pentagon-radar-canvas { flex: 1; min-height: 280px; position: relative; }
+/* v15: 5각 레이더 + 5축 세로 스택 패널 */
+.pentagon-block { display: grid; grid-template-columns: minmax(380px, 0.85fr) 1.15fr; border-bottom: 1px solid var(--line); }
+.pentagon-radar-wrap { padding: 28px 32px; border-right: 1px solid var(--line); display: flex; flex-direction: column; align-items: stretch; background: var(--bg-soft); min-height: 480px; }
+.pentagon-radar-title { font-family: var(--mono); font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-mute); font-weight: 500; margin-bottom: 10px; }
+.pentagon-radar-canvas { flex: 1; min-height: 360px; position: relative; }
 .pentagon-radar-canvas canvas { width: 100% !important; height: 100% !important; }
-.pentagon-radar-note { font-family: var(--mono); font-size: 9px; color: var(--ink-mute); letter-spacing: 0.05em; margin-top: 6px; text-align: center; }
-.pentagon-axes { display: grid; grid-template-columns: repeat(5, 1fr); }
-.pent-cell { padding: 22px 22px; border-right: 1px solid var(--line); }
-.pent-cell:last-child { border-right: none; }
-.pent-name { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 8px; }
-.pent-score { font-family: var(--serif); font-size: 34px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; }
-.pent-score-max { font-size: 14px; color: var(--ink-mute); font-family: var(--mono); font-weight: 400; }
+.pentagon-radar-note { font-family: var(--mono); font-size: 9px; color: var(--ink-mute); letter-spacing: 0.05em; margin-top: 10px; text-align: center; }
+
+/* 5축 세로 스택 */
+.pentagon-axes { display: flex; flex-direction: column; }
+.pent-cell { padding: 18px 28px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto auto; gap: 4px 16px; align-items: baseline; }
+.pent-cell:last-child { border-bottom: none; }
+.pent-name { grid-column: 1; grid-row: 1; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink); font-weight: 600; }
+.pent-score { grid-column: 2; grid-row: 1 / span 2; font-family: var(--serif); font-size: 36px; font-weight: 500; line-height: 1; letter-spacing: -0.02em; align-self: center; }
+.pent-score-max { font-size: 13px; color: var(--ink-mute); font-family: var(--mono); font-weight: 400; }
 .pent-score.good { color: var(--green); } .pent-score.mid { color: var(--amber); } .pent-score.low { color: var(--red); }
-.pent-bar { margin-top: 10px; height: 3px; background: var(--bg-card); overflow: hidden; }
+.pent-desc { grid-column: 1; grid-row: 2; font-family: var(--sans); font-size: 12px; color: var(--ink-soft); line-height: 1.4; letter-spacing: -0.005em; }
+.pent-bar { grid-column: 1 / span 2; grid-row: 3; margin-top: 8px; height: 3px; background: var(--bg-card); overflow: hidden; }
 .pent-bar-fill { height: 100%; transition: width 0.6s ease; }
 .pent-bar-fill.good { background: var(--green); } .pent-bar-fill.mid { background: var(--amber); } .pent-bar-fill.low { background: var(--red); }
-.pent-sub { font-family: var(--mono); font-size: 10px; color: var(--ink-soft); margin-top: 8px; line-height: 1.5; }
+.pent-sub { grid-column: 1 / span 2; grid-row: 4; font-family: var(--mono); font-size: 10px; color: var(--ink-mute); margin-top: 4px; line-height: 1.5; letter-spacing: 0.02em; }
 
 .section { padding: 48px 48px; border-bottom: 1px solid var(--line); }
 .sec-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
@@ -252,12 +255,11 @@ html, body { background: var(--bg); color: var(--ink); font-family: var(--sans);
 
 @media (max-width: 1024px) {
   .pentagon-block { grid-template-columns: 1fr; }
-  .pentagon-radar-wrap { border-right: none; border-bottom: 1px solid var(--line); }
+  .pentagon-radar-wrap { border-right: none; border-bottom: 1px solid var(--line); min-height: auto; }
   .pentagon-radar-canvas { min-height: 320px; }
-  .pentagon-axes { grid-template-columns: repeat(2, 1fr); }
-  .pent-cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .pent-cell:nth-child(2n) { border-right: none; }
-  .pent-cell:last-child { border-bottom: none; }
+  /* 5축은 모바일에서도 세로 스택 유지 */
+  .pent-cell { padding: 16px 24px; }
+  .pent-score { font-size: 32px; }
   .subkpi-grid { grid-template-columns: repeat(2, 1fr); }
   .chart-grid-2, .chart-grid-3 { grid-template-columns: 1fr; }
   .flow-grid, .fmt-grid { grid-template-columns: 1fr; }
@@ -1363,13 +1365,20 @@ function renderHero(creator, weekly, pent) {
 
 function renderPentagon(pent) {
   const labels = ['구독 성장', '콘텐츠 공급', '콘텐츠 효율', '인게이지먼트', '충성도'];
+  const descs = [
+    '신규 구독은 얼마나 들어오고, 들어온 사람은 얼마나 남는가',
+    '꾸준한 발행 리듬을 유지하고 있는가',
+    '업로드한 영상이 끝까지 시청되는가',
+    '시청자가 좋아요·댓글·공유로 반응하는가',
+    '한 번 본 시청자가 다시 돌아오는가',
+  ];
   const g = pent.raw.growth, s = pent.raw.supply, e = pent.raw.efficiency, n = pent.raw.engagement, l = pent.raw.loyalty;
   const subs = [
-    `${fmt.signed(Math.round(g.avgSubNet))}/주 · 유지율 ${g.avgRetention.toFixed(1)}%`,
-    `${s.perWeek.toFixed(1)}건/주 · 공백 ${s.empty}주`,
-    `평균 ${e.avgVP.toFixed(1)}%`,
-    `${n.rate.toFixed(2)}% · ${fmt.numK(n.total)}건`,
-    l.real ? `재방문 ${l.raw}` : `프록시 · ${l.raw}`,
+    `${fmt.signed(Math.round(g.avgSubNet))}/주 · 유지율 ${g.avgRetention.toFixed(1)}% · sub_net(70%)+retention(30%)`,
+    `${s.perWeek.toFixed(1)}건/주 · 공백 ${s.empty}주 · uploads_total`,
+    `평균 ${e.avgVP.toFixed(1)}% · avg_view_pct`,
+    `${n.rate.toFixed(2)}% · ${fmt.numK(n.total)}건 · (likes+comments+shares)/views`,
+    l.real ? `재방문 ${l.raw} · returning_viewer_pct` : `프록시 · ${l.raw}`,
   ];
   return `<section class="pentagon-block">
     <div class="pentagon-radar-wrap">
@@ -1380,7 +1389,7 @@ function renderPentagon(pent) {
     <div class="pentagon-axes">
       ${pent.scores.map((sc, i) => {
         const cls = sc >= 70 ? 'good' : sc >= 50 ? 'mid' : 'low';
-        return `<div class="pent-cell"><div class="pent-name">${labels[i]}</div><div class="pent-score ${cls}">${sc}<span class="pent-score-max"> / 100</span></div><div class="pent-bar"><div class="pent-bar-fill ${cls}" style="width:${sc}%"></div></div><div class="pent-sub">${subs[i]}</div></div>`;
+        return `<div class="pent-cell"><div class="pent-name">${labels[i]}</div><div class="pent-desc">${descs[i]}</div><div class="pent-score ${cls}">${sc}<span class="pent-score-max"> / 100</span></div><div class="pent-bar"><div class="pent-bar-fill ${cls}" style="width:${sc}%"></div></div><div class="pent-sub">${subs[i]}</div></div>`;
       }).join('')}
     </div>
   </section>`;
