@@ -541,6 +541,8 @@ let STATE = {
   tierFilter: '★ 메가',
   overviewPeriod: 'all',  // 전사 §B 기간
   overviewCustom: null,
+  rankSortKey: 'growth',  // 'growth' | 'label' | 'subs' | 'status'
+  rankSortDir: 'desc',    // 'asc' | 'desc'
 };
 const charts = {};
 function destroyCharts() {
@@ -941,12 +943,27 @@ function renderTierRankingSection() {
     m._stats = { latestSubs, totalNet, avgPerWeek, weeks, totalUploads, totalEng, deltaPct };
   });
 
-  // 정렬: 데이터 있는 사람 우선, 그 안에서 기간 합계 순증 내림차순
+  // 정렬: 데이터 없는 사람은 항상 맨 아래, 그 외엔 선택된 키 기준
+  const LABEL_ORDER = { 'DAEAD': 0, 'LBE': 1, 'Caape': 2, 'Le.dinary': 3, '더넥스트레이블': 4 };
+  const STATUS_ORDER = { 'high': 0, 'watch': 1, 'healthy': 2 };  // 위험이 위로
   members.sort((a, b) => {
     if (a.hasData && !b.hasData) return -1;
     if (!a.hasData && b.hasData) return 1;
-    if (a.hasData && b.hasData) return b._stats.totalNet - a._stats.totalNet;
-    return b.score - a.score;
+
+    const dir = STATE.rankSortDir === 'desc' ? -1 : 1;
+    let cmp = 0;
+    if (STATE.rankSortKey === 'growth') {
+      cmp = a.hasData ? (a._stats.totalNet - b._stats.totalNet) : (a.score - b.score);
+    } else if (STATE.rankSortKey === 'label') {
+      cmp = (LABEL_ORDER[a.label] ?? 99) - (LABEL_ORDER[b.label] ?? 99);
+    } else if (STATE.rankSortKey === 'subs') {
+      const aS = a.hasData ? a._stats.latestSubs : (a.subs * 10000);
+      const bS = b.hasData ? b._stats.latestSubs : (b.subs * 10000);
+      cmp = aS - bS;
+    } else if (STATE.rankSortKey === 'status') {
+      cmp = (STATUS_ORDER[a.healthGrade] ?? 99) - (STATUS_ORDER[b.healthGrade] ?? 99);
+    }
+    return cmp * dir;
   });
 
   const rows = members.map((m, i) => {
@@ -1054,13 +1071,13 @@ function renderTierRankingSection() {
             <tr>
               <th style="width:44px;">#</th>
               <th>크리에이터</th>
-              <th style="width:110px;">레이블</th>
-              <th class="num" style="width:80px;">구독자</th>
-              <th class="num" style="width:120px;">기간 순증</th>
+              <th style="width:110px;cursor:pointer;user-select:none;" onclick="window._setRankSort('label')">레이블 ${STATE.rankSortKey === 'label' ? (STATE.rankSortDir === 'desc' ? '↓' : '↑') : '⇅'}</th>
+              <th class="num" style="width:80px;cursor:pointer;user-select:none;" onclick="window._setRankSort('subs')">구독자 ${STATE.rankSortKey === 'subs' ? (STATE.rankSortDir === 'desc' ? '↓' : '↑') : '⇅'}</th>
+              <th class="num" style="width:120px;cursor:pointer;user-select:none;" onclick="window._setRankSort('growth')">기간 순증 ${STATE.rankSortKey === 'growth' ? (STATE.rankSortDir === 'desc' ? '↓' : '↑') : '⇅'}</th>
               <th class="num" style="width:90px;">주당 평균</th>
               <th class="num" style="width:80px;">업로드</th>
               <th class="num" style="width:90px;">인게이지먼트</th>
-              <th style="width:72px;">상태</th>
+              <th style="width:72px;cursor:pointer;user-select:none;" onclick="window._setRankSort('status')">상태 ${STATE.rankSortKey === 'status' ? (STATE.rankSortDir === 'desc' ? '↓' : '↑') : '⇅'}</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -1069,6 +1086,18 @@ function renderTierRankingSection() {
     </section>
   `;
 }
+
+window._setRankSort = (key) => {
+  if (STATE.rankSortKey === key) {
+    // 같은 컬럼 다시 클릭 → 방향 토글
+    STATE.rankSortDir = STATE.rankSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    STATE.rankSortKey = key;
+    // 새 컬럼 클릭 시 기본 방향: 텍스트는 오름차순, 숫자/상태는 내림차순
+    STATE.rankSortDir = (key === 'label') ? 'asc' : 'desc';
+  }
+  renderOverview();
+};
 
 window._setOvPeriod = (p) => {
   STATE.overviewPeriod = p;
