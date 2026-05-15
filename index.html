@@ -536,9 +536,16 @@ const fmt = {
   numK: n => {
     n = n || 0; const abs = Math.abs(n);
     if (abs >= 1e8) return (n/1e8).toFixed(2) + '억';
-    if (abs >= 1e4) return Math.round(n/1e4) + '만';
+    if (abs >= 1e4) return (n/1e4).toFixed(1) + '만';
     if (abs >= 1e3) return (n/1e3).toFixed(1) + 'K';
     return Math.round(n).toString();
+  },
+  // 시청시간 전용 (소수점 1자리 유지)
+  hours: n => {
+    n = n || 0; const abs = Math.abs(n);
+    if (abs >= 1e4) return (n/1e4).toFixed(1) + '만';
+    if (abs >= 1e3) return (n/1e3).toFixed(2) + 'K';
+    return n.toFixed(1);
   },
   pct: (n, d=2) => (n||0).toFixed(d) + '%',
   signed: n => (n>=0?'+':'') + Math.round(n||0).toLocaleString('ko-KR'),
@@ -1750,7 +1757,7 @@ function renderWeeklyTrends(weekly, periodLabel, videos) {
   const totalLikes = weekly.reduce((s, w) => s + w.likes, 0);
   const totalShares = weekly.reduce((s, w) => s + w.shares, 0);
   const totalEng = totalComments + totalLikes + totalShares;
-  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 02</span><span class="sec-title">주차별 <em>트렌드</em></span><span class="sec-sub">${periodLabel}</span></div><div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);"><div class="subkpi"><div class="subkpi-name">총 조회수</div><div class="subkpi-val">${fmt.numK(totalViews)}</div><div class="subkpi-sub">주당 ${fmt.numK(totalViews/weekly.length)}</div></div><div class="subkpi"><div class="subkpi-name">시청 시간</div><div class="subkpi-val">${fmt.numK(totalWatch)}<span class="unit">시간</span></div><div class="subkpi-sub">주당 ${fmt.numK(totalWatch/weekly.length)}h</div></div><div class="subkpi"><div class="subkpi-name">총 인게이지먼트</div><div class="subkpi-val">${fmt.numK(totalEng)}</div><div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 조회수 추이</div><div class="chart-sub">롱폼 · 숏폼 흐름 비교</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span></div><div class="chart-canvas tall"><canvas id="ch-views"></canvas></div></div><div class="chart-card"><div class="chart-title">주차별 업로드 건수</div><div class="chart-sub">롱폼 · 숏폼 발행 패턴</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas tall"><canvas id="ch-uploads"></canvas></div></div></div><div class="chart-grid-2" style="margin-top:18px;"><div class="chart-card"><div class="chart-title">평균 시청 비율 추이</div><div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span><span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span></div><div class="chart-canvas"><canvas id="ch-vp"></canvas></div></div><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">시청자 반응 추이</div><div class="ctrl-segment" id="eng-filter" style="font-size:9px;"><button data-eng="all" class="active">전체</button><button data-eng="long">롱폼</button><button data-eng="short">숏폼</button></div></div><div class="chart-sub">좋아요 · 댓글 · 공유 (절대값)</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span><span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span><span><span class="lg-dot" style="background:var(--teal);"></span>공유</span></div><div class="chart-canvas"><canvas id="ch-eng"></canvas></div></div></div></section>`;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 02</span><span class="sec-title">주차별 <em>트렌드</em></span><span class="sec-sub">${periodLabel}</span></div><div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);"><div class="subkpi"><div class="subkpi-name">총 조회수</div><div class="subkpi-val">${fmt.numK(totalViews)}</div><div class="subkpi-sub">주당 ${fmt.numK(totalViews/weekly.length)}</div></div><div class="subkpi"><div class="subkpi-name">시청 시간</div><div class="subkpi-val">${fmt.hours(totalWatch)}<span class="unit">시간</span></div><div class="subkpi-sub">주당 ${fmt.hours(totalWatch/weekly.length)}h</div></div><div class="subkpi"><div class="subkpi-name">총 인게이지먼트</div><div class="subkpi-val">${fmt.numK(totalEng)}</div><div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 조회수 추이</div><div class="chart-sub">롱폼 · 숏폼 흐름 비교</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span></div><div class="chart-canvas tall"><canvas id="ch-views"></canvas></div></div><div class="chart-card"><div class="chart-title">주차별 업로드 건수</div><div class="chart-sub">롱폼 · 숏폼 발행 패턴</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas tall"><canvas id="ch-uploads"></canvas></div></div></div><div class="chart-grid-2" style="margin-top:18px;"><div class="chart-card"><div class="chart-title">평균 시청 비율 추이</div><div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span><span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span></div><div class="chart-canvas"><canvas id="ch-vp"></canvas></div></div><div class="chart-card"><div class="chart-title">시청자 반응 추이</div><div class="chart-sub">좋아요 · 댓글 · 공유 · weekly 기준 (Studio 일치)</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span><span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span><span><span class="lg-dot" style="background:var(--teal);"></span>공유</span></div><div class="chart-canvas"><canvas id="ch-eng"></canvas></div></div></div></section>`;
 }
 
 function renderFormatSplit(weekly, videos) {
@@ -1771,7 +1778,18 @@ function renderFormatSplit(weekly, videos) {
   const longEngRate = longViews > 0 ? ((longLikes + longComments + longShares) / longViews * 100) : 0;
   const shortEngRate = shortViews > 0 ? ((shortLikes + shortComments + shortShares) / shortViews * 100) : 0;
   const cells = (vals) => vals.map(([m, v, w]) => `<div class="fmt-row"><span class="metric">${m}</span><span class="value">${v}${w ? '<span class="winner">HIGH</span>' : ''}</span></div>`).join('');
-  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 03</span><span class="sec-title">롱폼 vs <em>숏폼</em></span><span class="sec-sub">${videos.length}개 영상 · weekly 합계 + 영상 평균</span></div><div class="fmt-grid"><div class="fmt-cell"><div class="fmt-eyebrow">▶ LONG-FORM</div><div class="fmt-name long">롱폼</div>${cells([['업로드', longUploads + '건', longUploads > shortUploads],['총 조회', fmt.numK(longViews), longViews > shortViews],['편당 평균 조회', fmt.numK(longAvg), longAvg > shortAvg],['인게이지먼트율', longEngRate.toFixed(2) + '%', longEngRate > shortEngRate],['총 좋아요', fmt.numK(longLikes), longLikes > shortLikes],['총 댓글', fmt.numK(longComments), longComments > shortComments]])}</div><div class="fmt-cell"><div class="fmt-eyebrow">⏵ SHORT-FORM</div><div class="fmt-name short">숏폼</div>${cells([['업로드', shortUploads + '건', shortUploads > longUploads],['총 조회', fmt.numK(shortViews), shortViews > longViews],['편당 평균 조회', fmt.numK(shortAvg), shortAvg > longAvg],['인게이지먼트율', shortEngRate.toFixed(2) + '%', shortEngRate > longEngRate],['총 좋아요', fmt.numK(shortLikes), shortLikes > longLikes],['총 댓글', fmt.numK(shortComments), shortComments > longComments]])}</div></div><div class="chart-grid-2" style="margin-top:24px;"><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">조회수 비중 추이</div><div class="ctrl-segment" id="fmt-chart-toggle" style="font-size:9px;"><button data-fmtmode="abs" class="${STATE.fmtChartMode === 'abs' ? 'active' : ''}">절대값</button><button data-fmtmode="pct" class="${STATE.fmtChartMode === 'pct' ? 'active' : ''}">비중</button></div></div><div class="chart-sub">롱폼 vs 숏폼 · ${STATE.fmtChartMode === 'pct' ? '100% 누적' : '실선 추이'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-views"></canvas></div></div><div class="chart-card"><div class="chart-title">업로드 비중 추이</div><div class="chart-sub">주차별 발행 ${STATE.fmtChartMode === 'pct' ? '비중 · 100% 누적' : '건수 · 실선 추이'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-uploads"></canvas></div></div></div></section>`;
+  // 기간 표시: weekly의 첫 주~마지막 주
+  let periodRange = '';
+  if (weekly.length > 0) {
+    const firstWeek = weekly[0].week_start;
+    const lastWeek = weekly[weekly.length - 1].week_start;
+    // 마지막 주의 일요일 = week_start + 6일
+    const lastSunday = new Date(lastWeek);
+    lastSunday.setDate(lastSunday.getDate() + 6);
+    const lastSundayStr = lastSunday.toISOString().slice(0, 10);
+    periodRange = `${firstWeek} ~ ${lastSundayStr}`;
+  }
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 03</span><span class="sec-title">롱폼 vs <em>숏폼</em></span><span class="sec-sub">${periodRange} (${videos.length}개 영상 · weekly 합계 · 영상 평균)</span></div><div class="fmt-grid"><div class="fmt-cell"><div class="fmt-eyebrow">▶ LONG-FORM</div><div class="fmt-name long">롱폼</div>${cells([['업로드', longUploads + '건', longUploads > shortUploads],['총 조회', fmt.numK(longViews), longViews > shortViews],['편당 평균 조회', fmt.numK(longAvg), longAvg > shortAvg],['인게이지먼트율', longEngRate.toFixed(2) + '%', longEngRate > shortEngRate],['총 좋아요', fmt.numK(longLikes), longLikes > shortLikes],['총 댓글', fmt.numK(longComments), longComments > shortComments]])}</div><div class="fmt-cell"><div class="fmt-eyebrow">⏵ SHORT-FORM</div><div class="fmt-name short">숏폼</div>${cells([['업로드', shortUploads + '건', shortUploads > longUploads],['총 조회', fmt.numK(shortViews), shortViews > longViews],['편당 평균 조회', fmt.numK(shortAvg), shortAvg > longAvg],['인게이지먼트율', shortEngRate.toFixed(2) + '%', shortEngRate > longEngRate],['총 좋아요', fmt.numK(shortLikes), shortLikes > longLikes],['총 댓글', fmt.numK(shortComments), shortComments > longComments]])}</div></div><div class="chart-grid-2" style="margin-top:24px;"><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">조회수 비중 추이</div><div class="ctrl-segment" id="fmt-chart-toggle" style="font-size:9px;"><button data-fmtmode="abs" class="${STATE.fmtChartMode === 'abs' ? 'active' : ''}">절대값</button><button data-fmtmode="pct" class="${STATE.fmtChartMode === 'pct' ? 'active' : ''}">비중</button></div></div><div class="chart-sub">롱폼 vs 숏폼 · ${STATE.fmtChartMode === 'pct' ? '100% 누적' : '실선 추이'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-views"></canvas></div></div><div class="chart-card"><div class="chart-title">업로드 비중 추이</div><div class="chart-sub">주차별 발행 ${STATE.fmtChartMode === 'pct' ? '비중 · 100% 누적' : '건수 · 실선 추이'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-uploads"></canvas></div></div></div></section>`;
 }
 
 let bwTab = 'views';
@@ -1833,7 +1851,7 @@ function renderVideoRanking(allVideos, allWeekly) {
       <span class="sec-sub">${periodLabel} · ${valid.length}개 영상</span>
     </div>
     <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap;">
-      <span class="ctrl-label">기간 (§04 전용)</span>
+      <span class="ctrl-label">게시일 기준 기간</span>
       <div class="ctrl-segment">${periodTabs}</div>
       ${customUI}
     </div>
@@ -2281,27 +2299,13 @@ function buildVPChart(weekly, videos) {
   charts.vp = new Chart(ctx, { type: 'line', data: { labels, datasets }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw == null ? '데이터 없음' : ctx.raw.toFixed(1) + '%') } } }, scales: { x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } }, y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => v + '%' }, beginAtZero: true } } } });
 }
 
-let engFilter = 'all';
 function buildEngagementChart(weekly, videos) {
   const ctx = document.getElementById('ch-eng'); if (!ctx) return;
-  document.querySelectorAll('#eng-filter button').forEach(btn => {
-    btn.onclick = () => {
-      engFilter = btn.dataset.eng;
-      document.querySelectorAll('#eng-filter button').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      if (charts.eng) charts.eng.destroy();
-      buildEngagementChart(weekly, videos);
-    };
-  });
   const labels = weekly.map(w => w.week_label);
-  let likes, comments, shares;
-  if (engFilter === 'all') { likes = weekly.map(w => w.likes); comments = weekly.map(w => w.comments); shares = weekly.map(w => w.shares); }
-  else {
-    const t = engFilter;
-    likes = weekly.map(w => videos.filter(v => v.week_label === w.week_label && v.video_type === t).reduce((s, v) => s + v.likes, 0));
-    comments = weekly.map(w => videos.filter(v => v.week_label === w.week_label && v.video_type === t).reduce((s, v) => s + v.comments, 0));
-    shares = weekly.map(w => videos.filter(v => v.week_label === w.week_label && v.video_type === t).reduce((s, v) => s + v.shares, 0));
-  }
+  // weekly 데이터만 사용 (Studio 일치) - 롱숏 분리 제거
+  const likes = weekly.map(w => w.likes);
+  const comments = weekly.map(w => w.comments);
+  const shares = weekly.map(w => w.shares);
   charts.eng = new Chart(ctx, { type: 'line', data: { labels, datasets: [
     { label: '좋아요', data: likes, borderColor: '#D4537E', backgroundColor: 'rgba(212,83,126,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false },
     { label: '댓글', data: comments, borderColor: '#185FA5', backgroundColor: 'rgba(24,95,165,0.08)', tension: 0.3, borderWidth: 2, pointRadius: 3, fill: false },
