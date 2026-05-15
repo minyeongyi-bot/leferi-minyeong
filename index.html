@@ -631,6 +631,7 @@ let STATE = {
   overviewCustom: null,
   rankSortKey: 'growth',  // 'growth' | 'label' | 'subs' | 'status'
   rankSortDir: 'desc',    // 'asc' | 'desc'
+  fmtChartMode: 'abs',    // 'abs' | 'pct' — §03 롱폼/숏폼 차트 표시 모드
 };
 const charts = {};
 function destroyCharts() {
@@ -1749,7 +1750,7 @@ function renderWeeklyTrends(weekly, periodLabel, videos) {
   const totalLikes = weekly.reduce((s, w) => s + w.likes, 0);
   const totalShares = weekly.reduce((s, w) => s + w.shares, 0);
   const totalEng = totalComments + totalLikes + totalShares;
-  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 02</span><span class="sec-title">주차별 <em>트렌드</em></span><span class="sec-sub">${periodLabel}</span></div><div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);"><div class="subkpi"><div class="subkpi-name">총 조회수</div><div class="subkpi-val">${fmt.numK(totalViews)}</div><div class="subkpi-sub">주당 ${fmt.numK(totalViews/weekly.length)}</div></div><div class="subkpi"><div class="subkpi-name">시청 시간</div><div class="subkpi-val">${fmt.numK(totalWatch)}<span class="unit">시간</span></div><div class="subkpi-sub">주당 ${fmt.numK(totalWatch/weekly.length)}h</div></div><div class="subkpi"><div class="subkpi-name">총 인게이지먼트</div><div class="subkpi-val">${fmt.numK(totalEng)}</div><div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 조회수 추이</div><div class="chart-sub">롱폼 · 숏폼 흐름 비교</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span></div><div class="chart-canvas tall"><canvas id="ch-views"></canvas></div></div><div class="chart-card"><div class="chart-title">주차별 업로드 건수</div><div class="chart-sub">롱폼 · 숏폼 발행 패턴</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas tall"><canvas id="ch-uploads"></canvas></div></div></div><div class="chart-grid-2" style="margin-top:18px;"><div class="chart-card"><div class="chart-title">평균 시청 비율 추이</div><div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 (실선)</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 (점선)</span><span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span></div><div class="chart-canvas"><canvas id="ch-vp"></canvas></div></div><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">시청자 반응 추이</div><div class="ctrl-segment" id="eng-filter" style="font-size:9px;"><button data-eng="all" class="active">전체</button><button data-eng="long">롱폼</button><button data-eng="short">숏폼</button></div></div><div class="chart-sub">좋아요 · 댓글 · 공유 (절대값)</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span><span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span><span><span class="lg-dot" style="background:var(--teal);"></span>공유</span></div><div class="chart-canvas"><canvas id="ch-eng"></canvas></div></div></div></section>`;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 02</span><span class="sec-title">주차별 <em>트렌드</em></span><span class="sec-sub">${periodLabel}</span></div><div class="subkpi-grid" style="grid-template-columns:repeat(3,1fr);"><div class="subkpi"><div class="subkpi-name">총 조회수</div><div class="subkpi-val">${fmt.numK(totalViews)}</div><div class="subkpi-sub">주당 ${fmt.numK(totalViews/weekly.length)}</div></div><div class="subkpi"><div class="subkpi-name">시청 시간</div><div class="subkpi-val">${fmt.numK(totalWatch)}<span class="unit">시간</span></div><div class="subkpi-sub">주당 ${fmt.numK(totalWatch/weekly.length)}h</div></div><div class="subkpi"><div class="subkpi-name">총 인게이지먼트</div><div class="subkpi-val">${fmt.numK(totalEng)}</div><div class="subkpi-sub">좋아요 ${fmt.numK(totalLikes)} · 댓글 ${fmt.numK(totalComments)} · 공유 ${fmt.numK(totalShares)}</div></div></div><div class="chart-grid-2"><div class="chart-card"><div class="chart-title">주차별 조회수 추이</div><div class="chart-sub">롱폼 · 숏폼 흐름 비교</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼 조회</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼 조회</span></div><div class="chart-canvas tall"><canvas id="ch-views"></canvas></div></div><div class="chart-card"><div class="chart-title">주차별 업로드 건수</div><div class="chart-sub">롱폼 · 숏폼 발행 패턴</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas tall"><canvas id="ch-uploads"></canvas></div></div></div><div class="chart-grid-2" style="margin-top:18px;"><div class="chart-card"><div class="chart-title">평균 시청 비율 추이</div><div class="chart-sub">avg_view_pct · 롱폼/숏폼 가중평균</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span><span><span class="lg-dot" style="background:var(--ink-mute);"></span>채널 평균</span></div><div class="chart-canvas"><canvas id="ch-vp"></canvas></div></div><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">시청자 반응 추이</div><div class="ctrl-segment" id="eng-filter" style="font-size:9px;"><button data-eng="all" class="active">전체</button><button data-eng="long">롱폼</button><button data-eng="short">숏폼</button></div></div><div class="chart-sub">좋아요 · 댓글 · 공유 (절대값)</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--pink);"></span>좋아요</span><span><span class="lg-dot" style="background:var(--blue);"></span>댓글</span><span><span class="lg-dot" style="background:var(--teal);"></span>공유</span></div><div class="chart-canvas"><canvas id="ch-eng"></canvas></div></div></div></section>`;
 }
 
 function renderFormatSplit(weekly, videos) {
@@ -1770,7 +1771,7 @@ function renderFormatSplit(weekly, videos) {
   const longEngRate = longViews > 0 ? ((longLikes + longComments + longShares) / longViews * 100) : 0;
   const shortEngRate = shortViews > 0 ? ((shortLikes + shortComments + shortShares) / shortViews * 100) : 0;
   const cells = (vals) => vals.map(([m, v, w]) => `<div class="fmt-row"><span class="metric">${m}</span><span class="value">${v}${w ? '<span class="winner">HIGH</span>' : ''}</span></div>`).join('');
-  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 03</span><span class="sec-title">롱폼 vs <em>숏폼</em></span><span class="sec-sub">${videos.length}개 영상 · weekly 합계 + 영상 평균</span></div><div class="fmt-grid"><div class="fmt-cell"><div class="fmt-eyebrow">▶ LONG-FORM</div><div class="fmt-name long">롱폼</div>${cells([['업로드', longUploads + '건', longUploads > shortUploads],['총 조회', fmt.numK(longViews), longViews > shortViews],['편당 평균 조회', fmt.numK(longAvg), longAvg > shortAvg],['인게이지먼트율', longEngRate.toFixed(2) + '%', longEngRate > shortEngRate],['총 좋아요', fmt.numK(longLikes), longLikes > shortLikes],['총 댓글', fmt.numK(longComments), longComments > shortComments]])}</div><div class="fmt-cell"><div class="fmt-eyebrow">⏵ SHORT-FORM</div><div class="fmt-name short">숏폼</div>${cells([['업로드', shortUploads + '건', shortUploads > longUploads],['총 조회', fmt.numK(shortViews), shortViews > longViews],['편당 평균 조회', fmt.numK(shortAvg), shortAvg > longAvg],['인게이지먼트율', shortEngRate.toFixed(2) + '%', shortEngRate > longEngRate],['총 좋아요', fmt.numK(shortLikes), shortLikes > longLikes],['총 댓글', fmt.numK(shortComments), shortComments > longComments]])}</div></div><div class="chart-grid-2" style="margin-top:24px;"><div class="chart-card"><div class="chart-title">조회수 비중 추이</div><div class="chart-sub">롱폼 vs 숏폼 · 100% 누적</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-views"></canvas></div></div><div class="chart-card"><div class="chart-title">업로드 비중 추이</div><div class="chart-sub">주차별 발행 비중 · 100% 누적</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-uploads"></canvas></div></div></div></section>`;
+  return `<section class="section"><div class="sec-head"><span class="sec-num">§ 03</span><span class="sec-title">롱폼 vs <em>숏폼</em></span><span class="sec-sub">${videos.length}개 영상 · weekly 합계 + 영상 평균</span></div><div class="fmt-grid"><div class="fmt-cell"><div class="fmt-eyebrow">▶ LONG-FORM</div><div class="fmt-name long">롱폼</div>${cells([['업로드', longUploads + '건', longUploads > shortUploads],['총 조회', fmt.numK(longViews), longViews > shortViews],['편당 평균 조회', fmt.numK(longAvg), longAvg > shortAvg],['인게이지먼트율', longEngRate.toFixed(2) + '%', longEngRate > shortEngRate],['총 좋아요', fmt.numK(longLikes), longLikes > shortLikes],['총 댓글', fmt.numK(longComments), longComments > shortComments]])}</div><div class="fmt-cell"><div class="fmt-eyebrow">⏵ SHORT-FORM</div><div class="fmt-name short">숏폼</div>${cells([['업로드', shortUploads + '건', shortUploads > longUploads],['총 조회', fmt.numK(shortViews), shortViews > longViews],['편당 평균 조회', fmt.numK(shortAvg), shortAvg > longAvg],['인게이지먼트율', shortEngRate.toFixed(2) + '%', shortEngRate > longEngRate],['총 좋아요', fmt.numK(shortLikes), shortLikes > longLikes],['총 댓글', fmt.numK(shortComments), shortComments > longComments]])}</div></div><div class="chart-grid-2" style="margin-top:24px;"><div class="chart-card"><div class="chart-title-row" style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;"><div class="chart-title">조회수 비중 추이</div><div class="ctrl-segment" id="fmt-chart-toggle" style="font-size:9px;"><button data-fmtmode="abs" class="${STATE.fmtChartMode === 'abs' ? 'active' : ''}">절대값</button><button data-fmtmode="pct" class="${STATE.fmtChartMode === 'pct' ? 'active' : ''}">비중</button></div></div><div class="chart-sub">롱폼 vs 숏폼 · ${STATE.fmtChartMode === 'pct' ? '100% 누적' : '실선 추이'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-views"></canvas></div></div><div class="chart-card"><div class="chart-title">업로드 비중 추이</div><div class="chart-sub">주차별 발행 ${STATE.fmtChartMode === 'pct' ? '비중 · 100% 누적' : '건수 · 실선 추이'}</div><div class="chart-legend"><span><span class="lg-dot" style="background:var(--purple);"></span>롱폼</span><span><span class="lg-dot" style="background:var(--orange);"></span>숏폼</span></div><div class="chart-canvas"><canvas id="ch-fmt-uploads"></canvas></div></div></div></section>`;
 }
 
 let bwTab = 'views';
@@ -2261,11 +2262,11 @@ function buildVPChart(weekly, videos) {
     pointBackgroundColor: '#534AB7', pointBorderColor: '#fff', pointBorderWidth: 1.5,
     fill: false, spanGaps: true, order: 2
   });
-  // 숏폼: 점선 + 오렌지 + 다른 포인트 모양 (rectRot)
+  // 숏폼: 실선 + 오렌지 + 다른 포인트 모양 (rectRot)
   if (hasShort) datasets.push({
     label: '숏폼', data: shortVP,
     borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.12)',
-    tension: 0.3, borderWidth: 2.5, borderDash: [6, 4],
+    tension: 0.3, borderWidth: 2.5,
     pointRadius: 4, pointHoverRadius: 6, pointStyle: 'rectRot',
     pointBackgroundColor: '#D85A30', pointBorderColor: '#fff', pointBorderWidth: 1.5,
     fill: false, spanGaps: true, order: 1
@@ -2310,157 +2311,183 @@ function buildEngagementChart(weekly, videos) {
 
 function buildFormatViewsChart(weekly) {
   const ctx = document.getElementById('ch-fmt-views'); if (!ctx) return;
-  const labels = weekly.map(w => w.week_label);
-  // 100% 누적 — 비중을 비율로 계산
-  const longPct = weekly.map(w => {
-    const total = (w.views_long || 0) + (w.views_short || 0);
-    return total > 0 ? (w.views_long / total) * 100 : null;
-  });
-  const shortPct = weekly.map(w => {
-    const total = (w.views_long || 0) + (w.views_short || 0);
-    return total > 0 ? (w.views_short / total) * 100 : null;
-  });
-  // 절대값은 툴팁용
-  const longAbs = weekly.map(w => w.views_long);
-  const shortAbs = weekly.map(w => w.views_short);
 
-  charts.fmtViews = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '롱폼',
-          data: longPct,
-          backgroundColor: 'rgba(83,74,183,0.65)',
-          borderColor: '#534AB7',
-          borderWidth: 1.5,
-          fill: 'origin',
-          tension: 0.3,
-          pointRadius: 2,
-          stack: 'fmt'
-        },
-        {
-          label: '숏폼',
-          data: shortPct,
-          backgroundColor: 'rgba(216,90,48,0.7)',
-          borderColor: '#D85A30',
-          borderWidth: 1.5,
-          fill: 'origin',
-          tension: 0.3,
-          pointRadius: 2,
-          stack: 'fmt'
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(26,24,21,0.92)',
-          titleFont: { family: 'Pretendard', size: 11, weight: 600 },
-          bodyFont: { family: 'JetBrains Mono', size: 11 },
-          padding: 10,
-          callbacks: {
-            label: (c) => {
-              const idx = c.dataIndex;
-              const abs = c.dataset.label === '롱폼' ? longAbs[idx] : shortAbs[idx];
-              const pct = c.raw == null ? 0 : c.raw;
-              return c.dataset.label + ': ' + pct.toFixed(1) + '% (' + fmt.numK(abs) + ')';
+  // 토글 이벤트 바인딩
+  document.querySelectorAll('#fmt-chart-toggle button').forEach(btn => {
+    btn.onclick = () => {
+      STATE.fmtChartMode = btn.dataset.fmtmode;
+      renderDash();
+    };
+  });
+
+  const labels = weekly.map(w => w.week_label);
+  const mode = STATE.fmtChartMode;  // 'abs' | 'pct'
+
+  if (mode === 'pct') {
+    // 100% 누적 영역 차트
+    const longPct = weekly.map(w => {
+      const total = (w.views_long || 0) + (w.views_short || 0);
+      return total > 0 ? (w.views_long / total) * 100 : null;
+    });
+    const shortPct = weekly.map(w => {
+      const total = (w.views_long || 0) + (w.views_short || 0);
+      return total > 0 ? (w.views_short / total) * 100 : null;
+    });
+    const longAbs = weekly.map(w => w.views_long);
+    const shortAbs = weekly.map(w => w.views_short);
+
+    charts.fmtViews = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: '롱폼', data: longPct, backgroundColor: 'rgba(83,74,183,0.65)', borderColor: '#534AB7', borderWidth: 1.5, fill: 'origin', tension: 0.3, pointRadius: 2, stack: 'fmt' },
+          { label: '숏폼', data: shortPct, backgroundColor: 'rgba(216,90,48,0.7)', borderColor: '#D85A30', borderWidth: 1.5, fill: 'origin', tension: 0.3, pointRadius: 2, stack: 'fmt' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(26,24,21,0.92)',
+            titleFont: { family: 'Pretendard', size: 11, weight: 600 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            padding: 10,
+            callbacks: {
+              label: (c) => {
+                const idx = c.dataIndex;
+                const abs = c.dataset.label === '롱폼' ? longAbs[idx] : shortAbs[idx];
+                const pct = c.raw == null ? 0 : c.raw;
+                return c.dataset.label + ': ' + pct.toFixed(1) + '% (' + fmt.numK(abs) + ')';
+              }
             }
           }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 9 } } },
-        y: {
-          stacked: true,
-          min: 0, max: 100,
-          ticks: { callback: v => v + '%', font: { family: 'JetBrains Mono', size: 9 } },
-          grid: { color: 'rgba(229,225,216,0.6)' }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 9 } } },
+          y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + '%', font: { family: 'JetBrains Mono', size: 9 } }, grid: { color: 'rgba(229,225,216,0.6)' } }
         }
       }
-    }
-  });
+    });
+  } else {
+    // 절대값 라인 차트 (실선)
+    charts.fmtViews = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: '롱폼', data: weekly.map(w => w.views_long), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.3, borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#534AB7', pointBorderColor: '#fff', pointBorderWidth: 1.5, fill: false },
+          { label: '숏폼', data: weekly.map(w => w.views_short), borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.08)', tension: 0.3, borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 5, pointStyle: 'rectRot', pointBackgroundColor: '#D85A30', pointBorderColor: '#fff', pointBorderWidth: 1.5, fill: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(26,24,21,0.92)',
+            titleFont: { family: 'Pretendard', size: 11, weight: 600 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            padding: 10,
+            callbacks: { label: (c) => c.dataset.label + ': ' + fmt.numK(c.raw) }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 9 } } },
+          y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { callback: v => fmt.numK(v), font: { family: 'JetBrains Mono', size: 9 } }, beginAtZero: true }
+        }
+      }
+    });
+  }
 }
 
 function buildFormatUploadsChart(weekly) {
   const ctx = document.getElementById('ch-fmt-uploads'); if (!ctx) return;
   const labels = weekly.map(w => w.week_label);
-  // 100% 누적 — 업로드 비중
-  const longPct = weekly.map(w => {
-    const total = (w.uploads_long || 0) + (w.uploads_short || 0);
-    return total > 0 ? (w.uploads_long / total) * 100 : null;
-  });
-  const shortPct = weekly.map(w => {
-    const total = (w.uploads_long || 0) + (w.uploads_short || 0);
-    return total > 0 ? (w.uploads_short / total) * 100 : null;
-  });
-  const longAbs = weekly.map(w => w.uploads_long);
-  const shortAbs = weekly.map(w => w.uploads_short);
+  const mode = STATE.fmtChartMode;
 
-  charts.fmtUp = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '롱폼',
-          data: longPct,
-          backgroundColor: 'rgba(83,74,183,0.65)',
-          borderColor: '#534AB7',
-          borderWidth: 1.5,
-          fill: 'origin',
-          tension: 0.3,
-          pointRadius: 2,
-          stack: 'fmt'
-        },
-        {
-          label: '숏폼',
-          data: shortPct,
-          backgroundColor: 'rgba(216,90,48,0.7)',
-          borderColor: '#D85A30',
-          borderWidth: 1.5,
-          fill: 'origin',
-          tension: 0.3,
-          pointRadius: 2,
-          stack: 'fmt'
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: 'rgba(26,24,21,0.92)',
-          titleFont: { family: 'Pretendard', size: 11, weight: 600 },
-          bodyFont: { family: 'JetBrains Mono', size: 11 },
-          padding: 10,
-          callbacks: {
-            label: (c) => {
-              const idx = c.dataIndex;
-              const abs = c.dataset.label === '롱폼' ? longAbs[idx] : shortAbs[idx];
-              const pct = c.raw == null ? 0 : c.raw;
-              return c.dataset.label + ': ' + pct.toFixed(1) + '% (' + abs + '건)';
+  if (mode === 'pct') {
+    // 100% 누적 영역 차트
+    const longPct = weekly.map(w => {
+      const total = (w.uploads_long || 0) + (w.uploads_short || 0);
+      return total > 0 ? (w.uploads_long / total) * 100 : null;
+    });
+    const shortPct = weekly.map(w => {
+      const total = (w.uploads_long || 0) + (w.uploads_short || 0);
+      return total > 0 ? (w.uploads_short / total) * 100 : null;
+    });
+    const longAbs = weekly.map(w => w.uploads_long);
+    const shortAbs = weekly.map(w => w.uploads_short);
+
+    charts.fmtUp = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: '롱폼', data: longPct, backgroundColor: 'rgba(83,74,183,0.65)', borderColor: '#534AB7', borderWidth: 1.5, fill: 'origin', tension: 0.3, pointRadius: 2, stack: 'fmt' },
+          { label: '숏폼', data: shortPct, backgroundColor: 'rgba(216,90,48,0.7)', borderColor: '#D85A30', borderWidth: 1.5, fill: 'origin', tension: 0.3, pointRadius: 2, stack: 'fmt' }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(26,24,21,0.92)',
+            titleFont: { family: 'Pretendard', size: 11, weight: 600 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            padding: 10,
+            callbacks: {
+              label: (c) => {
+                const idx = c.dataIndex;
+                const abs = c.dataset.label === '롱폼' ? longAbs[idx] : shortAbs[idx];
+                const pct = c.raw == null ? 0 : c.raw;
+                return c.dataset.label + ': ' + pct.toFixed(1) + '% (' + abs + '건)';
+              }
             }
           }
-        }
-      },
-      scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 9 } } },
-        y: {
-          stacked: true,
-          min: 0, max: 100,
-          ticks: { callback: v => v + '%', font: { family: 'JetBrains Mono', size: 9 } },
-          grid: { color: 'rgba(229,225,216,0.6)' }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 9 } } },
+          y: { stacked: true, min: 0, max: 100, ticks: { callback: v => v + '%', font: { family: 'JetBrains Mono', size: 9 } }, grid: { color: 'rgba(229,225,216,0.6)' } }
         }
       }
-    }
-  });
+    });
+  } else {
+    // 절대값 라인 차트 (실선)
+    charts.fmtUp = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          { label: '롱폼', data: weekly.map(w => w.uploads_long), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.3, borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 5, pointBackgroundColor: '#534AB7', pointBorderColor: '#fff', pointBorderWidth: 1.5, fill: false },
+          { label: '숏폼', data: weekly.map(w => w.uploads_short), borderColor: '#D85A30', backgroundColor: 'rgba(216,90,48,0.08)', tension: 0.3, borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 5, pointStyle: 'rectRot', pointBackgroundColor: '#D85A30', pointBorderColor: '#fff', pointBorderWidth: 1.5, fill: false }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(26,24,21,0.92)',
+            titleFont: { family: 'Pretendard', size: 11, weight: 600 },
+            bodyFont: { family: 'JetBrains Mono', size: 11 },
+            padding: 10,
+            callbacks: { label: (c) => c.dataset.label + ': ' + c.raw + '건' }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10, font: { family: 'JetBrains Mono', size: 9 } } },
+          y: { grid: { color: 'rgba(229,225,216,0.6)' }, ticks: { stepSize: 1, font: { family: 'JetBrains Mono', size: 9 } }, beginAtZero: true }
+        }
+      }
+    });
+  }
 }
 
 // ==============================================
